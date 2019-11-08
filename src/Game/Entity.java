@@ -3,23 +3,24 @@ package Game;
 import java.util.ArrayList;
 
 public abstract class Entity extends Tile {
-	private String id;
-	private int hp;
-	private int mp;
-	private int pa;
-	private int hpmax;
-	private int mpmax;
-	private int pamax;	
-	private boolean alive;
-	private int lvl;
-	private int xp;
-	private int intel;
-	private int str;
-	private int gold;
-	private ArrayList<Item> inventory;
-	private ArrayList<Skill> skills;
+	protected String id;
+	protected int hp;
+	protected int mp;
+	protected int pa;
+	protected int hpmax;
+	protected int mpmax;
+	protected int pamax;	
+	protected boolean alive;
+	protected int lvl;
+	protected int xp;
+	protected int intel;
+	protected int str;
+	protected int gold;
+	protected ArrayList<Item> inventory;
+	protected ArrayList<Skill> skills;
 	
 	public Entity() {
+		super(0,0);
 		alive=true;
 		lvl=0;
 		xp=0;
@@ -39,6 +40,7 @@ public abstract class Entity extends Tile {
 	
 	public Entity(String id, int hp, int mp, int pa, int hpmax, int mpmax, int pamax, boolean alive, int lvl, int xp,
 			int intel, int str, int gold, ArrayList<Item> inventory, ArrayList<Skill> skills) {
+		super(0,0);
 		this.id = id;
 		this.hp = hp;
 		this.mp = mp;

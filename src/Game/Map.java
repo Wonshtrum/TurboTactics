@@ -46,7 +46,7 @@ public class Map {
 		this.width = width;
 		this.height = height;
 		this.floor = floor;
-		this.tiles = new GameEntity[width][height];
+		this.tiles = new Tile[width][height];
 		//Spawn players
 		for (int x=0 ; x<width ; x++) {
 			for (int y=0 ; y<height ; y++) {
