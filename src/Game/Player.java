@@ -2,60 +2,172 @@ package Game;
 
 import javax.websocket.Session;
 import Utils.Tools;
+import java.util.*;
+import java.math.*;
+
 
 public class Player {
 	private Session session;
-	public double x;
-	public double y;
-	private int size;
-	private int speed;
-	private int keys;
-	private String id;
-	public Player(Session session) {
-		this.session = session;
-		this.id = session.getId();
-		this.x = Tools.randInt(500);
-		this.y = Tools.randInt(500);
-		this.size = (int)Math.pow(Tools.randFloat(1,2), 2);
-		this.speed = 5;
-		this.keys = 0;
-	}
-	public void control(int keys) {
-		this.keys |= keys;
-	}
-	public void update() {
-		if ((this.keys & 1) != 0) {
-			this.y -= this.speed;
-		}
-		if ((this.keys & 2) != 0) {
-			this.y += this.speed;
-		}
-		if ((this.keys & 4) != 0) {
-			this.x += this.speed;
-		}
-		if ((this.keys & 8) != 0) {
-			this.x -= this.speed;
-		}
-		this.keys = 0;
-	}
-	public String getId() {
-		return id;
-	}
-	public int getSize() {
-		return this.size*10;
-	}
+	private String name;
+	private boolean alive;
+	private int x;
+	private int y;
+	private int lvl;
+	private int xp;
+	private int hpmax;
+	private int mpmax;
+	private int pamax;
+	private int hp;
+	private int mp;
+	private int pa;
+	private int intel;
+	private int str;
+	private int gold;
+	private ArrayList<Item> inventory;
+	private ArrayList<Skill> skills;
+	
+	
+	
 	public Session getSession() {
-		return this.session;
+		return session;
 	}
-	public void sendMessage(String message) {
-		try {
-			this.session.getAsyncRemote().sendText(message.replace("#", "\""));
-		} catch (Exception e) {
-			System.out.println("Illegal call ("+e+") for "+this.id);
+
+	public String getName() {
+		return name;
+	}
+
+	public boolean isAlive() {
+		return alive;
+	}
+
+	public int getX() {
+		return x;
+	}
+
+	public int getY() {
+		return y;
+	}
+	
+	public void setX(int newX) {
+		x=newX;
+	}
+	
+	public void setY(int newY) {
+		y=newY;
+	}
+
+	public int getLvl() {
+		return lvl;
+	}
+
+	public int getXp() {
+		return xp;
+	}
+
+	public int getHpmax() {
+		return hpmax;
+	}
+
+	public int getMpmax() {
+		return mpmax;
+	}
+
+	public int getPamax() {
+		return pamax;
+	}
+
+	public int getHp() {
+		return hp;
+	}
+
+	public int getMp() {
+		return mp;
+	}
+
+	public int getPa() {
+		return pa;
+	}
+
+	public int getIntel() {
+		return intel;
+	}
+
+	public int getStr() {
+		return str;
+	}
+
+	public int getGold() {
+		return gold;
+	}
+
+	public ArrayList<Item> getInventory() {
+		return inventory;
+	}
+
+	public ArrayList<Skill> getSkills() {
+		return skills;
+	}
+
+	public Player (String name, Session session) {
+		this.name=name;
+		this.session=session;
+		alive=true;
+		lvl=0;
+		xp=0;
+		hpmax=10;
+		mpmax=0;
+		pamax=5;
+		hp=hpmax;
+		mp=mpmax;
+		pa=pamax;
+		intel=5;
+		str=5;	
+		gold=0;
+		inventory= new ArrayList<Item>();
+		skills= new ArrayList<Skill>();
+	}
+	
+	public void die() {
+		alive=false;
+		System.out.println(name+" died.");
+	}
+	
+	public void gainXp(int sum) {		
+		int xpToUp=(int) (4/5*(Math.pow(lvl,3)+1));	
+		xp+=sum;
+		if (xp>= xpToUp) {
+			lvl+=1;
+			xp=xp-xpToUp;
+			System.out.println("pop-up de gain de compétence");
 		}
 	}
-	@Override
-	public String toString() {
-		return this.id+":["+this.x+","+this.y+","+this.size+"]";
+	
+	public void takeDamage(int dmg) {
+		hp-=dmg;
+		if (hp<=0) {
+			die();
+		}
 	}
+	
+	public void getHealed(int heal) {
+		if (hp+heal>hpmax) {
+			hp=hpmax;
+		} else {
+			hp=hp+heal;
+		}
+	}
+	
+	private void pickUp(Item item) {
+		if (inventory.size=10) {
+			inventory.add(item);
+		}
+		else {
+			System.out.println("inventaire deja plein");
+		}
+	}
+	
+	
+	
+	
+	
 }
