@@ -35,6 +35,27 @@ public abstract class Entity extends Tile {
 		inventory= new ArrayList<Item>();
 		skills= new ArrayList<Skill>();
 	}
+	
+	
+	public Entity(String id, int hp, int mp, int pa, int hpmax, int mpmax, int pamax, boolean alive, int lvl, int xp,
+			int intel, int str, int gold, ArrayList<Item> inventory, ArrayList<Skill> skills) {
+		this.id = id;
+		this.hp = hp;
+		this.mp = mp;
+		this.pa = pa;
+		this.hpmax = hpmax;
+		this.mpmax = mpmax;
+		this.pamax = pamax;
+		this.alive = alive;
+		this.lvl = lvl;
+		this.xp = xp;
+		this.intel = intel;
+		this.str = str;
+		this.gold = gold;
+		this.inventory = inventory;
+		this.skills = skills;
+	}
+
 
 	public String getId() {
 		return id;
@@ -120,6 +141,11 @@ public abstract class Entity extends Tile {
 		}
 	}
 	
+	public void DealDamage(int dmg, Entity e) {
+		e.takeDamage(dmg);
+		
+	}
+	
 	public void getHealed(int heal) {
 		if (hp+heal>hpmax) {
 			hp=hpmax;
@@ -136,5 +162,11 @@ public abstract class Entity extends Tile {
 			System.out.println("inventaire deja plein");
 		}
 	}
+	
+	public void Move (Map map, int x, int y) {
+		if (map.getTiles()[x][y] instanceof Wall) return;
+		//TODO
+	}
+	
 
 }

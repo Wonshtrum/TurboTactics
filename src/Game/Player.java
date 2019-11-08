@@ -1,7 +1,6 @@
 package Game;
 
 import javax.websocket.Session;
-import java.util.*;
 
 public class Player extends Entity {
 	private Session session;
@@ -19,13 +18,10 @@ public class Player extends Entity {
 		return session;
 	}
 	
-
-
 	public String getName() {
 		return name;
 	}
 	
-
 	public void sendMessage(String message) {
 		try {
 			this.session.getAsyncRemote().sendText(message.replace("#", "\""));
