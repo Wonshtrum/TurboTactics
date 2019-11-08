@@ -1,6 +1,6 @@
 package Game;
 
-public class Wall extends GameEntity{
+public class Wall extends Tile{
 
 	public Wall(int posx, int posy) {
 		super(posx,posy);
