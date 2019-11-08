@@ -3,13 +3,11 @@ package Game;
 import javax.websocket.Session;
 import java.util.*;
 
-public class Player {
+public class Player extends GameEntity {
 	private Session session;
 	private String id;
 	private String name;
 	private boolean alive;
-	private int x;
-	private int y;
 	private int lvl;
 	private int xp;
 	private int hpmax;
@@ -58,22 +56,6 @@ public class Player {
 
 	public boolean isAlive() {
 		return alive;
-	}
-
-	public int getX() {
-		return x;
-	}
-
-	public int getY() {
-		return y;
-	}
-	
-	public void setX(int newX) {
-		x=newX;
-	}
-	
-	public void setY(int newY) {
-		y=newY;
 	}
 
 	public int getLvl() {
