@@ -48,7 +48,11 @@ public class Player {
 		return this.session;
 	}
 	public void sendMessage(String message) {
-		this.session.getAsyncRemote().sendText(message.replace("#", "\""));
+		try {
+			this.session.getAsyncRemote().sendText(message.replace("#", "\""));
+		} catch (Exception e) {
+			System.out.println("Illegal call ("+e+") for "+this.id);
+		}
 	}
 	@Override
 	public String toString() {

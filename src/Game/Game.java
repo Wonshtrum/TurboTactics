@@ -18,7 +18,7 @@ public class Game {
 	public void addPlayer(Player player) {
 		this.players.put(player.getId(), player);
 		this.broadcast(player.getId()+" joined");
-		if (this.players.size() == 2) {
+		if (this.players.size() >= 2) {
 			this.start();
 		}
 	}

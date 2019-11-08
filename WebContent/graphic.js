@@ -1,26 +1,20 @@
 /*============ Creating a canvas =================*/
 
 let canvas = document.getElementById('myCan');
-let gl = canvas.getContext('webgl');
+let gl = canvas.getContext('webgl', { preserveDrawingBuffer: true });
 
 /*========== Defining and storing the geometry =========*/
-let vertices = [
-    -0.5,0.5,0.0,
-    -0.5,-0.5,0.0,
-    0.5,-0.5,0.0,
-    0.5,0.5,0.0 
-];
-m = 24;
-w = 25;
-h = 25;
-canvas.width = w;
-canvas.height = h;
+
+const width = 25;
+const height = 25;
+canvas.width = width;
+canvas.height = height;
 vertices = [
-    1,m,0.0,
-    1,1,0.0,
-    m,1,0.0,
-    m,m,0.0 
-].map((e,i) => [2*e/w-1,2*e/h-1,e][i%3]);
+    0,1,0,
+    0,0,0,
+    1,0,0,
+    1,1,0 
+]
 
 let indices = [3,2,1,3,1,0];
 
@@ -53,9 +47,11 @@ gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 // Vertex shader source code
 let vertCode = 'attribute vec3 coordinates;' +
 'varying vec3 v_position;' +
+'uniform vec4 u_size;' +
 'void main(void) {' +
-'	gl_Position = vec4(coordinates, 1);' +
-'	v_position  = vec3(coordinates);' +
+'	vec3 pos = vec3((coordinates.x*(u_size[2]-u_size[0])+u_size[0])/'+width/2.0+'-1.0, (coordinates.y*(u_size[3]-u_size[1])+u_size[1])/'+height/2.0+'-1.0, coordinates.z);' +
+'	gl_Position = vec4(pos, 1);' +
+'	v_position  = vec3(pos);' +
 '}';
 
 // Create a vertex shader object
@@ -70,8 +66,10 @@ gl.compileShader(vertShader);
 // Fragment shader source code
 let fragCode = 'precision mediump float;' +
 'varying vec3 v_position;' +
+'uniform vec4 u_color;' +
 'void main(void) {' +
 '	gl_FragColor = vec4(v_position*0.5+0.5, 1.0);' +
+'	gl_FragColor = u_color;' +
 '}';
 
 // Create fragment shader object 
@@ -99,6 +97,9 @@ gl.linkProgram(shaderProgram);
 // Use the combined shader program object
 gl.useProgram(shaderProgram);
 
+const locSize = gl.getUniformLocation(shaderProgram, "u_size");
+const locColor = gl.getUniformLocation(shaderProgram, "u_color");
+
 /* ======= Associating shaders to buffer objects =======*/
 
 // Bind vertex buffer object
@@ -118,17 +119,28 @@ gl.enableVertexAttribArray(coord);
 
 /*============= Drawing the Quad ================*/
 
-// Clear the canvas
-gl.clearColor(0.5, 0.5, 0.5, 0.9);
-
 // Enable the depth test
-gl.enable(gl.DEPTH_TEST);
-
-// Clear the color buffer bit
-gl.clear(gl.COLOR_BUFFER_BIT);
+//gl.enable(gl.DEPTH_TEST);
 
 // Set the view port
 gl.viewport(0,0,canvas.width,canvas.height);
 
-// Draw the triangle
-gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT,0);
+let clearCan = function(r, g, b) {
+	if (!(r && g && b)) {
+		r = 1;
+		g = 1;
+		b = 1;
+	}
+	// Clear the color buffer bit
+	gl.clear(gl.COLOR_BUFFER_BIT);
+	// Clear the canvas
+	gl.clearColor(r, g, b, 1);
+}
+
+let drawQuad = function(x1, y1, x2, y2, r, g, b, a) {
+	a = a || 1;
+	gl.uniform4f(locSize, x1, y1, x2, y2);
+	gl.uniform4f(locColor, r, g, b, a);
+	//Draw the triangles
+	gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT,0);	
+}
