@@ -5,7 +5,7 @@ public class Map {
 	private int width;
 	private int height;
 	private int floor;
-	private GameEntity[][] tiles;
+	private Tile[][] tiles;
 	public int getWidth() {
 		return width;
 	}
@@ -24,10 +24,10 @@ public class Map {
 	public void setFloor(int floor) {
 		this.floor = floor;
 	}
-	public GameEntity[][] getTiles() {
+	public Tile[][] getTiles() {
 		return tiles;
 	}
-	public void setTiles(GameEntity[][] tiles) {
+	public void setTiles(Tile[][] tiles) {
 		this.tiles = tiles;
 	}
 	public Map(int width, int height, int floor, Player[] players) {

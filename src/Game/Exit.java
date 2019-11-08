@@ -1,6 +1,6 @@
 package Game;
 
-public class Exit extends GameEntity {
+public class Exit extends Tile {
 
 	public Exit(int posx,int posy) {
 		super();
