@@ -1,6 +1,7 @@
 package Game;
 
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 public class Game {
 	private HashMap<String, Player> players;
@@ -21,6 +22,8 @@ public class Game {
 		if (this.players.size() >= 2) {
 			this.start();
 		}
+		Map map = new Map(8,8,0,players.values().stream().collect(Collectors.toList()));
+		System.out.println(map);
 	}
 	public void removePlayer(String id) {
 		players.remove(id);

@@ -23,6 +23,7 @@ public class Player extends GameEntity {
 	private ArrayList<Skill> skills;
 		
 	public Player (String name, Session session) {
+		super(0,0);
 		this.session=session;
 		this.id=session.getId();
 		this.name=name;
@@ -155,5 +156,10 @@ public class Player extends GameEntity {
 		} catch (Exception e) {
 			System.out.println("Illegal attempt ("+e+") for session "+id);
 		}
+	}
+
+	@Override
+	public String toString() {
+		return this.id;
 	}
 }
