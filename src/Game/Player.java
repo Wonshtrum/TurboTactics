@@ -1,13 +1,11 @@
 package Game;
 
 import javax.websocket.Session;
-import Utils.Tools;
 import java.util.*;
-import java.math.*;
-
 
 public class Player {
 	private Session session;
+	private String id;
 	private String name;
 	private boolean alive;
 	private int x;
@@ -25,11 +23,33 @@ public class Player {
 	private int gold;
 	private ArrayList<Item> inventory;
 	private ArrayList<Skill> skills;
-	
-	
-	
+		
+	public Player (String name, Session session) {
+		this.session=session;
+		this.id=session.getId();
+		this.name=name;
+		alive=true;
+		lvl=0;
+		xp=0;
+		hpmax=10;
+		mpmax=0;
+		pamax=5;
+		hp=hpmax;
+		mp=mpmax;
+		pa=pamax;
+		intel=5;
+		str=5;	
+		gold=0;
+		inventory= new ArrayList<Item>();
+		skills= new ArrayList<Skill>();
+	}
+
 	public Session getSession() {
 		return session;
+	}
+	
+	public String getId() {
+		return id;
 	}
 
 	public String getName() {
@@ -107,25 +127,6 @@ public class Player {
 	public ArrayList<Skill> getSkills() {
 		return skills;
 	}
-
-	public Player (String name, Session session) {
-		this.name=name;
-		this.session=session;
-		alive=true;
-		lvl=0;
-		xp=0;
-		hpmax=10;
-		mpmax=0;
-		pamax=5;
-		hp=hpmax;
-		mp=mpmax;
-		pa=pamax;
-		intel=5;
-		str=5;	
-		gold=0;
-		inventory= new ArrayList<Item>();
-		skills= new ArrayList<Skill>();
-	}
 	
 	public void die() {
 		alive=false;
@@ -157,17 +158,20 @@ public class Player {
 		}
 	}
 	
-	private void pickUp(Item item) {
-		if (inventory.size=10) {
+	public void pickUp(Item item) {
+		if (inventory.size()<10) {
 			inventory.add(item);
 		}
 		else {
 			System.out.println("inventaire deja plein");
 		}
 	}
-	
-	
-	
-	
-	
+
+	public void sendMessage(String message) {
+		try {
+			this.session.getAsyncRemote().sendText(message.replace("#", "\""));
+		} catch (Exception e) {
+			System.out.println("Illegal attempt ("+e+") for session "+id);
+		}
+	}
 }

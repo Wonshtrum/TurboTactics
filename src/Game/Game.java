@@ -10,7 +10,7 @@ public class Game {
 	public void receive(String id, String data) {
 		System.out.println(data);
 		try {
-			this.players.get(id).control(Integer.parseInt(data));
+			//this.players.get(id).control(Integer.parseInt(data));
 		} catch (Exception e) {
 			Manager.getInstance().removePlayer(id);
 		}

@@ -22,7 +22,7 @@ public class Manager {
 	public void addPlayer(Session session, int idGame) {
 		sessions.put(session.getId(), session);
 		Game game = games.get(idGame);
-		game.addPlayer(new Player(session));
+		game.addPlayer(new Player("JeanRandom", session));
 		playerToGame.put(session.getId(), game);
 	}
 
