@@ -24,14 +24,14 @@ public class Player extends Entity {
 	
 	public void sendMessage(String message) {
 		try {
-			this.session.getAsyncRemote().sendText(message.replace("#", "\""));
+			this.session.getBasicRemote().sendText(message.replace("#", "\""));
 		} catch (Exception e) {
-			System.out.println("Illegal attempt ("+e+") for session "+this.getId());
+			System.out.println("Illegal call ("+e+") for session "+this.getId());
 		}
 	}
 
 	@Override
 	public String toString() {
-		return this.id;
+		return "P"+this.id;
 	}
 }

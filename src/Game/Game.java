@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 public class Game {
 	private HashMap<String, Player> players;
+	private Map map;
 	public Game() {
 		this.players = new HashMap<String, Player>();
 	}
@@ -22,17 +23,15 @@ public class Game {
 		if (this.players.size() >= 2) {
 			this.start();
 		}
-		Map map = new Map(8,8,0,players.values().stream().collect(Collectors.toList()));
-		System.out.println(map);
 	}
 	public void removePlayer(String id) {
 		players.remove(id);
 		this.broadcast(id+" left");
 	}
 	public void start() {
-		String map = "{#w#:4,#h#:4,#map#:[[0,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,0]]}";
+		this.map = new Map(8,8,0,players.values().stream().collect(Collectors.toList()));
 		this.broadcast("start");
-		this.broadcast("map", map);
+		this.broadcast("map", map.toString());
 	}
 	public void broadcast(String data) {
 		this.broadcast("msg", "#"+data+"#");

@@ -5,8 +5,8 @@ let gl = canvas.getContext('webgl', { preserveDrawingBuffer: true });
 
 /*========== Defining and storing the geometry =========*/
 
-const width = 25;
-const height = 25;
+const width = 49;
+const height = 49;
 canvas.width = width;
 canvas.height = height;
 vertices = [
@@ -49,7 +49,7 @@ let vertCode = 'attribute vec3 coordinates;' +
 'varying vec3 v_position;' +
 'uniform vec4 u_size;' +
 'void main(void) {' +
-'	vec3 pos = vec3((coordinates.x*(u_size[2]-u_size[0])+u_size[0])/'+width/2.0+'-1.0, (coordinates.y*(u_size[3]-u_size[1])+u_size[1])/'+height/2.0+'-1.0, coordinates.z);' +
+'	vec3 pos = vec3((coordinates.x*(u_size[2]-u_size[0])+u_size[0])/'+width/2.0+'-1.0, (coordinates.y*(u_size[1]-u_size[3])-u_size[1])/'+height/2.0+'+1.0, coordinates.z);' +
 '	gl_Position = vec4(pos, 1);' +
 '	v_position  = vec3(pos);' +
 '}';
@@ -125,7 +125,7 @@ gl.enableVertexAttribArray(coord);
 // Set the view port
 gl.viewport(0,0,canvas.width,canvas.height);
 
-let clearCan = function(r, g, b) {
+let clearMap = function(r, g, b) {
 	if (!(r && g && b)) {
 		r = 1;
 		g = 1;

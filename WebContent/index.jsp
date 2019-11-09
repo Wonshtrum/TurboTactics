@@ -12,5 +12,6 @@
 </body>
 <script src="script.js" type="text/javascript"></script>
 <script src="graphic.js" type="text/javascript"></script>
+<script src="game.js" type="text/javascript"></script>
 
 </html>

@@ -48,18 +48,8 @@ document.addEventListener('keyup', (event) => {
 		break;
 	}
 })
-let drawMap = function(data) {
-	for (let x=0 ; x<data.w ; x++) {
-		for (let y=0 ; y<data.h ; y++) {
-			console.log(x,y,data.map[x][y]);
-			if (data.map[x][y]) {
-				drawQuad(x*5+1, y*5+1, (x+1)*5, (y+1)*5, 0, 0.1, 0.2);
-			} else {
-				drawQuad(x*5+1, y*5+1, (x+1)*5, (y+1)*5, 0, 0.5, 0.4);
-			}
-		}
-	}
-}
+
+let map;
 socket.onmessage = function(event) {
 	console.log(event.data);
 	data = JSON.parse(event.data);
@@ -69,6 +59,8 @@ socket.onmessage = function(event) {
 		PLAYERS = data.data;
 	} else {
 		console.log(data);
-		drawMap(data.data);
+		map = data.data;
+		clearMap();
+		drawMap(map);
 	}
 }

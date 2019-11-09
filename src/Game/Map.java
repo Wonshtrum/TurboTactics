@@ -59,13 +59,13 @@ public class Map {
 					tiles[1][1] = players.get(0);
 					break;
 				case 1:
-					tiles[0][1] = players.get(0);
+					tiles[0][1] = players.get(1);
 					break;
 				case 2:
-					tiles[1][0] = players.get(0);
+					tiles[1][0] = players.get(2);
 					break;
 				case 3:
-					tiles[0][0] = players.get(0);
+					tiles[0][0] = players.get(3);
 					break;
 				default:
 					break;
@@ -75,15 +75,21 @@ public class Map {
 	}
 	
 	public String toString() {
-		String res = "[";
+		String res = "{#w#:"+width+",#h#:"+height+",#map#:[";
 		for (int x=0 ; x<width ; x++) {
 			res += "[";
 			for (int y=0 ; y<height ; y++) {
-				res += tiles[x][y]+", ";
+				res += "#"+tiles[x][y]+"#";
+				if (y<height-1) {
+					res+=",";
+				}
 			}
-			res += "],\n";
+			res += "]";
+			if (x<width-1) {
+				res+=",";
+			}
 		}
-		res += "]";
+		res += "]}";
 		return res;
 	}
 }
