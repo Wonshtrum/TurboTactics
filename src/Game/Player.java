@@ -6,7 +6,6 @@ public class Player extends Entity {
 	private Session session;
 	private String name;
 
-		
 	public Player (String name, Session session) {
 		super();
 		this.session=session;
@@ -33,5 +32,8 @@ public class Player extends Entity {
 	@Override
 	public String toString() {
 		return "P"+this.id;
+	}
+	public String fullData() {
+		return "#P"+this.id+"#:{"+super.toString()+"}";
 	}
 }

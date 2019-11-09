@@ -2,8 +2,9 @@ package Game;
 
 import java.util.List;
 
+import Utils.Tools;
+
 public class Map {
-	
 	private int width;
 	private int height;
 	private int floor;
@@ -13,16 +14,8 @@ public class Map {
 		return width;
 	}
 	
-	public void setWidth(int width) {
-		this.width = width;
-	}
-	
 	public int getHeight() {
 		return height;
-	}
-	
-	public void setHeight(int height) {
-		this.height = height;
 	}
 	
 	public int getFloor() {
@@ -41,6 +34,14 @@ public class Map {
 		this.tiles = tiles;
 	}
 	
+	public void place(int x, int y, Tile tile) {
+		if (tile != null) {
+			tile.posX = x;
+			tile.posY = y;
+		}
+		tiles[x][y] = tile;
+	}
+	
 	public Map(int width, int height, int floor, List<Player> players) {
 		super();
 		this.width = width;
@@ -50,22 +51,24 @@ public class Map {
 		//Spawn players
 		for (int x=0 ; x<width ; x++) {
 			for (int y=0 ; y<height ; y++) {
-				tiles[x][y] = new Wall(x, y);
-			}			
+				if (Tools.randInt(0, 5) == 0) {
+					tiles[x][y] = new Wall(x, y);
+				}
+			}
 		}
 		for (int i=0 ; i < players.size() ; i++) {
 			switch (i) {
 				case 0:
-					tiles[1][1] = players.get(0);
+					place(1, 1, players.get(0));
 					break;
 				case 1:
-					tiles[0][1] = players.get(1);
+					place(0, 1, players.get(1));
 					break;
 				case 2:
-					tiles[1][0] = players.get(2);
+					place(1, 0, players.get(2));
 					break;
 				case 3:
-					tiles[0][0] = players.get(3);
+					place(0, 0, players.get(3));
 					break;
 				default:
 					break;
@@ -79,7 +82,15 @@ public class Map {
 		for (int x=0 ; x<width ; x++) {
 			res += "[";
 			for (int y=0 ; y<height ; y++) {
-				res += "#"+tiles[x][y]+"#";
+				if (tiles[x][y] != null) {
+					if (tiles[x][y] instanceof Entity) {
+						res += "#"+tiles[x][y]+"#";
+					} else {
+						res += tiles[x][y];
+					}
+				} else {
+					res += 0;
+				}
 				if (y<height-1) {
 					res+=",";
 				}

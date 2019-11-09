@@ -1,6 +1,7 @@
 package Game;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class Game {
@@ -25,13 +26,31 @@ public class Game {
 		}
 	}
 	public void removePlayer(String id) {
+		Player player = players.get(id);
+		this.map.place(player.posX, player.posY, null);
 		players.remove(id);
 		this.broadcast(id+" left");
+		this.broadcast("players", sendPlayers());
+		this.broadcast("map", map.toString());
+	}
+	private String sendPlayers() {
+		String res = "{";
+		List<Player> playersList = players.values().stream().collect(Collectors.toList());
+		int length = playersList.size();
+		for (int i=0 ; i<length ; i++) {
+			res += playersList.get(i).fullData();
+			if (i<length-1) {
+				res += ",";
+			}
+		}
+		res += "}";
+		return res;
 	}
 	public void start() {
 		this.map = new Map(8,8,0,players.values().stream().collect(Collectors.toList()));
 		this.broadcast("start");
 		this.broadcast("map", map.toString());
+		this.broadcast("players", sendPlayers());
 	}
 	public void broadcast(String data) {
 		this.broadcast("msg", "#"+data+"#");

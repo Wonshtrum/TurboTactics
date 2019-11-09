@@ -28,7 +28,6 @@ public class Manager {
 
 	public void removePlayer(String id) {
 		try {
-			System.out.println("Try close "+id);
 			sessions.get(id).close();
 			playerToGame.get(id).removePlayer(id);
 			playerToGame.remove(id);

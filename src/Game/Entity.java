@@ -170,5 +170,17 @@ public abstract class Entity extends Tile {
 		//TODO
 	}
 	
-
+	public String toString() {
+		int[] values = {lvl, xp, hpmax, mpmax, pamax, hp, mp, pa, intel, str, gold};
+		String[] names = {"lvl", "xp", "hpmax", "mpmax", "pamax", "hp", "mp", "pa", "intel", "str", "gold"};
+		int length = values.length;
+		String res = "";
+		for (int i=0 ; i<length ; i++) {
+			res += "#"+names[i]+"#:"+values[i];
+			if (i<length-1) {
+				res += ",";
+			}
+		}
+		return res;
+	}
 }
