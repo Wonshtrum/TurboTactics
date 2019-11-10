@@ -13,6 +13,14 @@ public class Game {
 	public void receive(String id, String data) {
 		System.out.println(data);
 		try {
+			String cmd = data.substring(0, data.indexOf(":"));
+			String args = data.substring(data.indexOf(":")+1);
+			System.out.println(cmd+" "+args);
+			Player player = players.get(id);
+			if (cmd.equals("pos")) {
+				boolean valid = this.map.pathes(player.posX, player.posY).stream().anyMatch(t -> (t.x+","+t.y).equals(args));
+				player.sendMessage(typedData("msg", ""+valid));
+			}
 			//this.players.get(id).control(Integer.parseInt(data));
 		} catch (Exception e) {
 			Manager.getInstance().removePlayer(id);
@@ -52,12 +60,15 @@ public class Game {
 		this.broadcast("map", map.toString());
 		this.broadcast("players", sendPlayers());
 	}
+	public String typedData(String type, String data) {
+		return "{#type#:#"+type+"#,#data#:"+data+"}";
+	}
 	public void broadcast(String data) {
 		this.broadcast("msg", "#"+data+"#");
 	}
 	public void broadcast(String type, String data) {
 		for (Player player : players.values()) {
-			player.sendMessage("{#type#:#"+type+"#,#data#:"+data+"}");
+			player.sendMessage(typedData(type, data));
 		}
 	}
 }

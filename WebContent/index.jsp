@@ -10,8 +10,9 @@
 	<canvas id="myCan" width=50 height=50></canvas>
 	<div id="chat"></div>
 </body>
-<script src="script.js" type="text/javascript"></script>
+<script src="socket.js" type="text/javascript"></script>
 <script src="graphic.js" type="text/javascript"></script>
 <script src="game.js" type="text/javascript"></script>
+<script src="logic.js" type="text/javascript"></script>
 
 </html>
