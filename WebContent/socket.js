@@ -12,6 +12,7 @@ socket.onmessage = function(event) {
 	} else if (data.type === "map") {
 		console.log(data);
 		map = data.data;
+		setMap();
 		clearMap();
 		drawMap(map);
 	}

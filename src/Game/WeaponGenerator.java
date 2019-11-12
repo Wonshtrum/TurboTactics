@@ -21,6 +21,7 @@ public class WeaponGenerator {
 	};
 	
 	static final Enchant commonPrefix = new Enchant("", 0, 0, 0, 0, 0, 0, 0, 0);
+	
 	static final List<Enchant> rarePrefix = new ArrayList<Enchant>() {
 		private static final long serialVersionUID = -5980386674576906791L;
 		{
@@ -33,6 +34,7 @@ public class WeaponGenerator {
 			add(new Enchant("Mana", 2, 0, 0, 0, 0, 0, 10, 0));
 		}
 	};
+	
 	static final List<Enchant> epicPrefix = new ArrayList<Enchant>() {
 		private static final long serialVersionUID = -5980386674576906791L;
 		{
@@ -45,6 +47,7 @@ public class WeaponGenerator {
 			add(new Enchant("Infused", 2, 0, 0, 0, 0, 0, 20, 0));
 		}
 	};
+	
 	static final List<Enchant> legendaryPrefix = new ArrayList<Enchant>() {
 		private static final long serialVersionUID = -5980386674576906791L;
 		{
@@ -59,6 +62,7 @@ public class WeaponGenerator {
 			add(new Enchant("Overflowing", 2, 0, 0, 0, 0, 0, 60, 0));
 		}
 	};
+	
 	static final Enchant cheatPrefix = new Enchant("Overpowered", 0, 999, 999, 999, 999, 999, 999, 999);
 	
 	private static Enchant generateEnchant(int wType,int rank) {
@@ -151,7 +155,7 @@ public class WeaponGenerator {
 		return generateWeapon(wType,rank);
 	}
 	
-	public static Weapon generateWeapon(String wType,int rank) {
+	public static Weapon generateWeapon(String wType, int rank) {
 		Enchant ench1 = null;
 		Enchant ench2 = null;
 		String name = null;

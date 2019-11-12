@@ -68,8 +68,40 @@ let fragCode = 'precision mediump float;' +
 'varying vec3 v_position;' +
 'uniform vec4 u_color;' +
 'void main(void) {' +
-'	gl_FragColor = vec4(v_position*0.5+0.5, 1.0);' +
-'	gl_FragColor = u_color;' +
+'	if (u_color[3]==0.0) {' +
+'		float d = distance(v_position, vec3(0,0,v_position.z));' +
+'		gl_FragColor = vec4(vec3(u_color)/max(1.0, 5.0*d), 1.0);' +
+'	} else {' +
+'		gl_FragColor = u_color;' +
+'	}' +
+'}';
+
+fragCode = 'precision mediump float;' +
+'varying vec3 v_position;' +
+'uniform vec4 u_color;' +
+'uniform vec2 u_light;' +
+'uniform int u_mat[100];' +
+'int mat(int x, int y) {for (int i=0 ; i<64 ; i++) {if (i==9-y+8*x) {return u_mat[i];}};return 0;}' +
+'int mat_(int x, int y, bool r) {return r?mat(y/5,x/5):mat(x/5,y/5);}' +
+'int abs(int x) {return x<0?-x:x;}' +
+'int lx = int(u_light.x);' +
+'int ly = int(u_light.y);' +
+'bool line_(int x0, int y0, int x1, int y1, bool r) {int dx=x1>x0?1:-1; float dy=float(y1-y0)/float(dx*(x1-x0)); int x = x0; float y = float(y0); for (int i=0 ; i<1000 ; i++) {x+=dx; y+=dy; if (mat_(x,int(y),r)==1) {return false;} if (x==x1) {return mat_(x0,y0,r)==0;}} return false;}' +
+'bool line(int x0, int y0, int x1, int y1) {if (x0==x1 && y0==y1) {return true;} if (abs(x1-x0)>=abs(y1-y0)) {return line_(x0,y0,x1,y1,false);} else {return line_(y0,x0,y1,x1,true);}}' +
+'void main(void) {' +
+'	if (u_color[3]==0.0 && false) {' +
+'		float d = distance(v_position, vec3(0,0,v_position.z));' +
+'		gl_FragColor = vec4(vec3(u_color)/max(1.0, 0.1), 1.0);' +
+'	} else {' +
+'		int x = (int((v_position.x+1.0)*'+(width/2.0)+'));' +
+'		int y = (int((v_position.y+1.0)*'+(height/2.0)+')+1);' +
+'		float minL = 0.3;' +
+'		if (line(x,y,lx,ly)) {' +
+'			gl_FragColor = vec4(vec3(u_color)*max(minL,1.2-distance(vec2(x,y),vec2(lx,ly))/30.0),1);' +
+'		} else {' +
+'			gl_FragColor = vec4(vec3(u_color)*minL,1);' +
+'		}' +
+'	}' +
 '}';
 
 // Create fragment shader object 
@@ -78,7 +110,7 @@ let fragShader = gl.createShader(gl.FRAGMENT_SHADER);
 // Attach fragment shader source code
 gl.shaderSource(fragShader, fragCode);
 
-// Compile the fragmentt shader
+// Compile the fragment shader
 gl.compileShader(fragShader);
 
 // Create a shader program object to
@@ -99,6 +131,8 @@ gl.useProgram(shaderProgram);
 
 const locSize = gl.getUniformLocation(shaderProgram, "u_size");
 const locColor = gl.getUniformLocation(shaderProgram, "u_color");
+const locMat = gl.getUniformLocation(shaderProgram, "u_mat");
+const locLight = gl.getUniformLocation(shaderProgram, "u_light");
 
 /* ======= Associating shaders to buffer objects =======*/
 
@@ -125,6 +159,10 @@ gl.enableVertexAttribArray(coord);
 // Set the view port
 gl.viewport(0,0,canvas.width,canvas.height);
 
+let setMap = function() {
+	gl.uniform1iv(locMat,map.map.flat().map(e=>e==1?1:0));
+}
+
 let clearMap = function(r, g, b) {
 	if (!(r && g && b)) {
 		r = 1;
@@ -135,10 +173,11 @@ let clearMap = function(r, g, b) {
 	gl.clear(gl.COLOR_BUFFER_BIT);
 	// Clear the canvas
 	gl.clearColor(r, g, b, 1);
+	drawQuad(0, 0, map.w*side, map.h*side, r, g, b, 0);
 }
 
 let drawQuad = function(x1, y1, x2, y2, r, g, b, a) {
-	a = a || 1;
+	a = a==undefined?1:a;
 	gl.uniform4f(locSize, x1, y1, x2, y2);
 	gl.uniform4f(locColor, r, g, b, a);
 	//Draw the triangles

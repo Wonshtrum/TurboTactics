@@ -6,15 +6,15 @@ let drawMap = function() {
 			let tile = map.map[x][y];
 			if (tile == 0) {
 			} else if (tile == 1) {
-				drawQuad(x*side, y*side-1, (x+1)*side, (y+1)*side-1, 0, 0.8, 0.4);
-				drawQuad(x*side, (y+1)*side-1, (x+1)*side, (y+1)*side, 0, 0.7, 0.1);
+				drawQuad(x*side, y*side, (x+1)*side, (y+1)*side, 0, 0.8, 0.4);
+				//drawQuad(x*side, (y+1)*side-1, (x+1)*side, (y+1)*side, 0, 0.7, 0.1, 0);
 			} else if (tile == -1) {
-				drawQuad(x*side, y*side, (x+1)*side, (y+1)*side, 0, 0.5, 0.4);
+				drawQuad(x*side, y*side, (x+1)*side, (y+1)*side, 0, 0.5, 0.4, 0);
 			} else if (typeof(tile) == "string") {
 				if (tile[0] == "P") {
-					drawQuad(x*side+1, y*side+1, (x+1)*side-1, (y+1)*side-1, 1, 0, 0.8);
+					drawQuad(x*side+1, y*side+1, (x+1)*side-1, (y+1)*side-1, 1, 0, 0.8, 0);
 				} else if (tile[0] == "M") {
-					drawQuad(x*side+1, y*side+1, (x+1)*side-1, (y+1)*side-1, 0, 1, 0.8);
+					drawQuad(x*side+1, y*side+1, (x+1)*side-1, (y+1)*side-1, 0, 1, 0.8, 0);
 				}
 			} else {
 				console.log("Unknow tile:", tile);
@@ -47,6 +47,12 @@ let xyOnMap = function(e) {
 	return [clamp(x, 0, map.w-1), clamp(y, 0, map.h-1)];
 }
 
+let xyOnMapPixel = function(e) {
+	let x = Math.floor(width*(e.x-canvas.offsetTop)/canvas.offsetWidth);
+	let y = Math.floor(height*(e.y-canvas.offsetLeft)/canvas.offsetHeight);
+	return [Math.floor(x), Math.floor(y)];
+}
+
 let drawCursor = function(x, y, r, g, b) {
 	drawQuad(x*side, y*side, x*side+1, y*side+1, r, g, b);
 	drawQuad((x+1)*side, y*side, (x+1)*side-1, y*side+1, r, g, b);
@@ -56,7 +62,9 @@ let drawCursor = function(x, y, r, g, b) {
 
 let mouseMove = function(e) {
 	clearMap();
-	let [x ,y] = xyOnMap(e);
+	let [x, y] = xyOnMapPixel(e);
+	gl.uniform2f(locLight, x, height-y);
+	[x ,y] = xyOnMap(e);
 	drawMap();
 	drawCursor(x, y, 1, 0, 0);
 }
@@ -71,12 +79,12 @@ let mouseDown = function(e) {
 		console.log(player);
 		let paScale = player.pa+1;
 		for (let [i, j, k] of paths(x, y)) {
-			drawQuad(i*side, j*side, (i+1)*side, (j+1)*side, 0+k/paScale,0.5+0.5*k/paScale,0.5+0.5*k/paScale);
+			drawQuad(i*side, j*side, (i+1)*side, (j+1)*side, 0+k/paScale,0.5+0.5*k/paScale,0.5+0.5*k/paScale, 0);
 		}
 	}
 	drawMap();
 	drawCursor(x, y, 0.5, 0, 0);
 }
 
-canvas.addEventListener("mousemove",mouseMove)
-canvas.addEventListener("mousedown",mouseDown)
+canvas.addEventListener("mousemove",mouseMove);
+canvas.addEventListener("mousedown",mouseDown);
