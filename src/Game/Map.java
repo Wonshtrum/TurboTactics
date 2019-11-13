@@ -44,6 +44,7 @@ public class Map {
 					break;
 			}
 		}
+		place(width-2, height-2, new Mob());
 		tiles[width-1][height-1] = new Exit(height,width);
 	}
 	
