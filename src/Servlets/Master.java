@@ -31,18 +31,6 @@ public class Master extends HttpServlet {
     	System.out.println("----------");
     	System.out.println("---------- My super app is being intialized! ----------");
     	System.out.println("----------");
-    	System.out.println(WeaponGenerator.generateWeapon("Sword",0));
-    	System.out.println(WeaponGenerator.generateWeapon("Sword",0));
-    	System.out.println(WeaponGenerator.generateWeapon("Sword",0));
-    	System.out.println(WeaponGenerator.generateWeapon("Sword",0));
-    	System.out.println(WeaponGenerator.generateWeapon("Axe",0));
-    	System.out.println(WeaponGenerator.generateWeapon("Axe",0));
-    	System.out.println(WeaponGenerator.generateWeapon("Axe",0));
-    	System.out.println(WeaponGenerator.generateWeapon("Axe",0));
-    	System.out.println(WeaponGenerator.generateWeapon("Spear",0));
-    	System.out.println(WeaponGenerator.generateWeapon("Spear",0));
-    	System.out.println(WeaponGenerator.generateWeapon("Spear",0));
-    	System.out.println(WeaponGenerator.generateWeapon("Spear",0));
 	}
     
 	/**

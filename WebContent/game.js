@@ -9,7 +9,7 @@ let drawMap = function() {
 				drawQuad(x*side, y*side, (x+1)*side, (y+1)*side, 0, 0.5, 0.4, 1, true);
 			} else if (typeof(tile) == "string") {
 				if (tile[0] == "P") {
-					drawQuad(x*side, y*side, (x+1)*side, (y+1)*side, 1, 0, 0.8, 1, true, "knight");
+					drawQuad(x*side, y*side, (x+1)*side, (y+1)*side, 1, 1, 1, 1, true, "knight");
 				} else if (tile[0] == "M") {
 					drawQuad(x*side+4, y*side+8, (x+1)*side-4, (y+1)*side, 1, 1, 1, 1, true, "kirby");
 				}

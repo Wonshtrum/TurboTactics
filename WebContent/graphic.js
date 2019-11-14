@@ -1,7 +1,9 @@
 /*============ Creating a canvas =================*/
 
 let canvas = document.getElementById('myCan');
-let gl = canvas.getContext('webgl', { preserveDrawingBuffer: true });
+let gl = canvas.getContext('webgl', { preserveDrawingBuffer: true, premultipliedAlpha: false });
+gl.enable(gl.BLEND);
+gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
 /*========== Defining and storing the geometry =========*/
 
@@ -120,9 +122,9 @@ void main(void) {
 		color *= texture2D(u_texture, v_texcoord);
 	}
 	if (u_lit) {
-		float minL = 0.3;
+		float minL = 0.5;
 		if (line(x,y,lx,ly)) {
-			float d = max(0.0, 1.2-distance(vec2(x,y), vec2(lx,ly))/50.0);
+			float d = max(0.0, 1.5-distance(vec2(x,y), vec2(lx,ly))/100.0);
 			gl_FragColor = vec4(vec3(color)*max(minL, d), color[3]);
 		} else {
 			gl_FragColor = vec4(vec3(color)*minL, color[3]);
