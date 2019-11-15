@@ -1,4 +1,4 @@
-package Game;
+package Game.Items;
 public class Enchant {
 	private String enchantName; // Name of the enchant
 	private int wType; // 0:both, 1:physical, 2:magical

@@ -1,4 +1,4 @@
-package Game;
+package Game.Map;
 
 public class Wall extends Tile{
 	public Wall(int posx, int posy) {

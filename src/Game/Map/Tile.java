@@ -1,4 +1,4 @@
-package Game;
+package Game.Map;
 
 public abstract class Tile {
 	public int posX;

@@ -1,6 +1,13 @@
-package Game;
+package Game.Entity;
 
 import java.util.ArrayList;
+
+import Game.Buffs.Buff;
+import Game.Items.Item;
+import Game.Map.Map;
+import Game.Map.Tile;
+import Game.Map.Wall;
+import Game.Skills.Skill;
 
 public abstract class Entity extends Tile {
 	protected String id;
@@ -18,28 +25,32 @@ public abstract class Entity extends Tile {
 	protected int gold;
 	protected ArrayList<Item> inventory;
 	protected ArrayList<Skill> skills;
+	protected ArrayList<Buff> buffs;
+	protected Map map;
 	
-	public Entity() {
+	public Entity(Map map) {
 		super(0,0);
-		alive=true;
-		lvl=0;
-		xp=0;
-		hpmax=10;
-		mpmax=0;
-		pamax=5;
-		hp=hpmax;
-		mp=mpmax;
-		pa=pamax;
-		intel=5;
-		str=5;	
-		gold=0;
-		inventory= new ArrayList<Item>();
-		skills= new ArrayList<Skill>();
+		this.alive=true;
+		this.lvl=0;
+		this.xp=0;
+		this.hpmax=10;
+		this.mpmax=0;
+		this.pamax=5;
+		this.hp=hpmax;
+		this.mp=mpmax;
+		this.pa=pamax;
+		this.intel=5;
+		this.str=5;	
+		this.gold=0;
+		this.inventory= new ArrayList<Item>();
+		this.skills= new ArrayList<Skill>();
+		this.buffs= new ArrayList<Buff>();
+		this.map= map;
 	}
 	
 	
 	public Entity(String id, int hp, int mp, int pa, int hpmax, int mpmax, int pamax, boolean alive, int lvl, int xp,
-			int intel, int str, int gold, ArrayList<Item> inventory, ArrayList<Skill> skills) {
+			int intel, int str, int gold, ArrayList<Item> inventory, ArrayList<Skill> skills,ArrayList<Buff> buffs, Map map) {
 		super(0,0);
 		this.id = id;
 		this.hp = hp;
@@ -56,8 +67,9 @@ public abstract class Entity extends Tile {
 		this.gold = gold;
 		this.inventory = inventory;
 		this.skills = skills;
+		this.buffs = buffs;
+		this.map = map;
 	}
-
 
 	public String getId() {
 		return id;
@@ -143,7 +155,7 @@ public abstract class Entity extends Tile {
 		}
 	}
 	
-	public void DealDamage(int dmg, Entity e) {
+	public void dealDamage(int dmg, Entity e) {
 		e.takeDamage(dmg);
 		
 	}
@@ -165,9 +177,10 @@ public abstract class Entity extends Tile {
 		}
 	}
 	
-	public void Move (Map map, int x, int y) {
-		if (map.getTiles()[x][y] instanceof Wall) return;
-		//TODO
+	public void move (int x, int y) {
+		this.map.move(this,x,y);
+		this.posX=x;
+		this.posY=y;
 	}
 	
 	public String toString() {
@@ -183,4 +196,13 @@ public abstract class Entity extends Tile {
 		}
 		return res;
 	}
+	
+	public void getBuff(Buff buff) {
+		this.buffs.add(buff);
+	}
+	
+	public void removeBuff(Buff buff) {
+		this.buffs.remove(buff);
+	}
+	
 }

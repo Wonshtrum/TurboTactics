@@ -3,6 +3,8 @@ package Game;
 import java.util.HashMap;
 import javax.websocket.Session;
 
+import Game.Entity.Player;
+
 public class Manager {
 	private HashMap<Integer, Game> games;
 	private HashMap<String, Game> playerToGame;

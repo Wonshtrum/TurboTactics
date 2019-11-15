@@ -1,4 +1,4 @@
-package Game;
+package Game.Items;
 public class Weapon {
 	private String name; // Weapon's name
 	private int rank; // 0:Common, 1:Rare, 2:Epic, 3:Legendary, 4:Mythical

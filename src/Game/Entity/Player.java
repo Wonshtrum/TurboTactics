@@ -1,13 +1,15 @@
-package Game;
+package Game.Entity;
 
 import javax.websocket.Session;
+
+import Game.Map.Map;
 
 public class Player extends Entity {
 	private Session session;
 	private String name;
 
 	public Player (String name, Session session) {
-		super();
+		super(null);
 		this.session=session;
 		this.setId(session.getId());
 		this.name=name;
@@ -19,6 +21,10 @@ public class Player extends Entity {
 	
 	public String getName() {
 		return name;
+	}
+	
+	public void setMap(Map map) {
+		this.map = map;
 	}
 	
 	public void sendMessage(String message) {

@@ -1,4 +1,4 @@
-package Game;
+package Game.Map;
 
 public class Exit extends Tile {
 	public Exit(int posx,int posy) {

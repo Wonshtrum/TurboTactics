@@ -1,8 +1,12 @@
-package Game;
+package Game.Map;
 
 import java.util.HashSet;
 import java.util.List;
 
+import Game.Entity.Entity;
+import Game.Entity.Mob;
+import Game.Entity.Player;
+import Game.Map.Exit;
 import Utils.Tools;
 import Utils.Triplet;
 
@@ -24,6 +28,9 @@ public class Map {
 				if (Tools.randInt(0, 5) == 0) {
 					tiles[x][y] = new Wall(x, y);
 				}
+				else {
+					tiles[x][y] = new Air(x,y);
+				}
 			}
 		}
 		for (int i=0 ; i < players.size() ; i++) {
@@ -44,7 +51,7 @@ public class Map {
 					break;
 			}
 		}
-		place(width-2, height-2, new Mob());
+		place(width-2, height-2, new Mob(this));
 		tiles[width-1][height-1] = new Exit(height,width);
 	}
 	
@@ -80,6 +87,12 @@ public class Map {
 		tiles[x][y] = tile;
 	}
 	
+	public void move(Entity target, int x, int y) {
+		this.tiles[target.posX][target.posY]=null;
+		this.tiles[x][y]=target;
+	}
+	
+	
 	public boolean inBound(int x, int y) {
 		return x>=0 && y>=0 && x<width && y<height;
 	}
@@ -94,7 +107,7 @@ public class Map {
 		HashSet<Triplet<Integer, Integer, Integer>> parents = new HashSet<>();
 		parents.add(new Triplet<Integer, Integer, Integer>(x, y, 0));
 		HashSet<Triplet<Integer, Integer, Integer>> newParents = new HashSet<>();
-		for (int pa=0 ; pa<entity.pa && parents.size()>0 ; pa++) {
+		for (int pa=0 ; pa<entity.getPa() && parents.size()>0 ; pa++) {
 			newParents.clear();
 			for (Triplet<Integer, Integer, Integer> triplet : parents) {
 				x = triplet.x;
@@ -117,17 +130,13 @@ public class Map {
 		
 	public String toString() {
 		String res = "{#w#:"+width+",#h#:"+height+",#map#:[";
-		for (int x=0 ; x<width ; x++) {
+		for (int x=0 ; x<this.width ; x++) {
 			res += "[";
 			for (int y=0 ; y<height ; y++) {
-				if (tiles[x][y] != null) {
-					if (tiles[x][y] instanceof Entity) {
-						res += "#"+tiles[x][y]+"#";
-					} else {
-						res += tiles[x][y];
-					}
+				if (tiles[x][y] instanceof Entity) {
+					res += "#"+tiles[x][y]+"#";
 				} else {
-					res += 0;
+					res += tiles[x][y];				
 				}
 				if (y<height-1) {
 					res+=",";

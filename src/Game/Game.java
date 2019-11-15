@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import Game.Entity.Player;
+import Game.Map.Map;
+
 public class Game {
 	private HashMap<String, Player> players;
 	private Map map;
@@ -56,6 +59,9 @@ public class Game {
 	}
 	public void start() {
 		this.map = new Map(8,8,0,players.values().stream().collect(Collectors.toList()));
+		for (Player player : players.values()) {
+			player.setMap(this.map);
+		}
 		this.broadcast("start");
 		this.broadcast("map", map.toString());
 		this.broadcast("players", sendPlayers());
