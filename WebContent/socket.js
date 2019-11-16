@@ -14,6 +14,7 @@ socket.onmessage = function(event) {
 		console.log(data);
 		map = data.data;
 		map.buffer = [];
+		map.animate = [];
 		setMap();
 		clearMap();
 		drawMap(map);

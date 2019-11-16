@@ -26,6 +26,22 @@ let drawMap = function() {
 			}
 		}
 	}
+	for (let i = map.animate.length-1 ; i>=0 ; i--) {
+		args = map.animate[i];
+		drawQuad(args.x, args.y, ...args.quad);
+		args.x += args.dx;
+		args.y += args.dy;
+		args.quad[0] += args.dx;
+		args.quad[1] += args.dy;
+		if (args.steps-- <= 0) {
+			map.animate.splice(i, 1);
+			console.log(args);
+			if (args.end) {
+				let [x, y, tile] = args.end;
+				map.map[x][y] = tile;
+			}
+		}
+	}
 	for (let layer of map.buffer) {
 		if (layer) {
 			for (let args of layer) {
@@ -97,16 +113,24 @@ let mouseDown = function(e) {
 	drawCursor(x, y, 0.5, 0, 0);
 }
 
+let animate = function(quad, x, y, dx, dy, steps, modifs) {
+	quad[0] += x;
+	quad[1] += y;
+	map.animate.push({quad:quad, x:x, y:y, xf:x+dx, yf:y+dy, dx:dx/steps, dy:dy/steps, steps:steps, end:modifs});
+}
+
 let time = 0;
 let timeStep = 0.1;
 let drawScene = function() {
+	let start = Date.now();
 	time += timeStep*Math.random();
 	gl.uniform1f(locTime, time);
 	clearMap();
 	drawMap();
+	//console.log(Date.now()-start);
 }
 
 canvas.addEventListener("mousemove",mouseMove);
 canvas.addEventListener("mousedown",mouseDown);
 
-setInterval(()=>drawScene(), 30);
+setInterval(()=>drawScene(), 20);

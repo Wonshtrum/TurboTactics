@@ -21,12 +21,12 @@ public class Game {
 				boolean valid = this.map.paths(player.posX, player.posY).stream().anyMatch(t -> (t.x+","+t.y).equals(args));
 				player.sendMessage(typedData("msg", ""+valid));
 			}
-			//this.players.get(id).control(Integer.parseInt(data));
 		} catch (Exception e) {
 			Manager.getInstance().removePlayer(id);
 		}
 	}
 	public void addPlayer(Player player) {
+		System.out.println("added: "+player.id);
 		this.players.put(player.getId(), player);
 		this.broadcast(player.getId()+" joined");
 		player.sendMessage(typedData("me", "#P"+player.getId()+"#"));
