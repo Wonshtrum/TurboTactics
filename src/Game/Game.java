@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import Game.Entity.Player;
+import Game.Map.Air;
 import Game.Map.Map;
 
 public class Game {
@@ -38,7 +39,7 @@ public class Game {
 	}
 	public void removePlayer(String id) {
 		Player player = players.get(id);
-		this.map.place(player.posX, player.posY, null);
+		this.map.place(player.posX, player.posY, new Air(0,0));
 		players.remove(id);
 		this.broadcast(id+" left");
 		this.broadcast("players", sendPlayers());
