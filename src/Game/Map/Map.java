@@ -101,7 +101,7 @@ public class Map {
 		return tiles[x][y];
 	}
 	
-	public HashSet<Triplet<Integer, Integer, Integer>> pathes(int x, int y) {
+	public HashSet<Triplet<Integer, Integer, Integer>> paths(int x, int y) {
 		Entity entity = (Entity) tiles[x][y];
 		HashSet<Triplet<Integer, Integer, Integer>> visited = new HashSet<>();
 		HashSet<Triplet<Integer, Integer, Integer>> parents = new HashSet<>();

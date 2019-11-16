@@ -85,17 +85,18 @@ let fragCode =
 `precision mediump float;
 varying vec3 v_position;
 varying vec2 v_texcoord;
+uniform float u_time;
 uniform vec4 u_color;
 uniform bool u_lit;
 uniform bool u_tex;
-uniform vec2 u_light;
+uniform vec3 u_lights[100];
+uniform int u_nlights;
 uniform sampler2D u_texture;
+uniform float u_repeat;
 uniform int u_mat[100];
 int mat(int x, int y) {for (int i=0 ; i<64 ; i++) {if (i==7-y+8*x) {return u_mat[i];}};return 0;}
 int mat_(int x, int y, bool r) {return r?mat(y/${side},x/${side}):mat(x/${side},y/${side});}
 int abs(int x) {return x<0?-x:x;}
-int lx = int(u_light.x);
-int ly = int(u_light.y);
 bool line_(int x0, int y0, int x1, int y1, bool r) {
 	int dx = x1>x0?1:-1;
 	float dy = float(y1-y0)/float(dx*(x1-x0));
@@ -119,13 +120,31 @@ void main(void) {
 	int y = int((v_position.y+1.0)*${height2});
 	vec4 color = u_color;
 	if (u_tex) {
-		color *= texture2D(u_texture, v_texcoord);
+		color *= texture2D(u_texture, v_texcoord*u_repeat);
 	}
 	if (u_lit) {
-		float minL = 0.5;
-		if (line(x,y,lx,ly)) {
-			float d = max(0.0, 1.5-distance(vec2(x,y), vec2(lx,ly))/100.0);
-			gl_FragColor = vec4(vec3(color)*max(minL, d), color[3]);
+		float power;
+		int lx;
+		int ly;
+		float d;
+		float minL = 0.6;
+		float d2 = 0.0;
+		float d3 = 0.0;
+		for (int i=0 ; i<100 ; i++) {
+			if (i >= u_nlights) {
+				break;
+			}
+			lx = int(u_lights[i].x);
+			ly = int(u_lights[i].y);
+			power = u_lights[i].z*(1.0+0.2*abs(sin(u_time+float(i))));
+			if (line(x,y,lx,ly)) {
+				d = distance(vec2(x,y), vec2(lx,ly));
+				d2 = max(d2, 1.0-d/(power*10.0));
+				d3 = max(d3, 1.1-d/(power*20.0));
+			}
+		}
+		if (d3 != 0.0) {
+			gl_FragColor = vec4(vec3(1,0.7,0.5)*(vec3(color)+d2*d2*d2)*d3+minL*vec3(color), color[3]);
 		} else {
 			gl_FragColor = vec4(vec3(color)*minL, color[3]);
 		}
@@ -159,12 +178,15 @@ gl.linkProgram(shaderProgram);
 // Use the combined shader program object
 gl.useProgram(shaderProgram);
 
+const locTime = gl.getUniformLocation(shaderProgram, "u_time");
 const locSize = gl.getUniformLocation(shaderProgram, "u_size");
 const locColor = gl.getUniformLocation(shaderProgram, "u_color");
 const locLit = gl.getUniformLocation(shaderProgram, "u_lit");
 const locTex = gl.getUniformLocation(shaderProgram, "u_tex");
+const locRep = gl.getUniformLocation(shaderProgram, "u_repeat");
 const locMat = gl.getUniformLocation(shaderProgram, "u_mat");
-const locLight = gl.getUniformLocation(shaderProgram, "u_light");
+const locLights = gl.getUniformLocation(shaderProgram, "u_lights");
+const locNLights = gl.getUniformLocation(shaderProgram, "u_nlights");
 const locGlobalTex = gl.getUniformLocation(shaderProgram, "u_texture");
 
 /* ======= Associating shaders to buffer objects =======*/
@@ -220,7 +242,8 @@ let setTex = function(index) {
 	gl.bindTexture(gl.TEXTURE_2D, textures[index]);
 }
 
-loadTex("wall.png", "wall");
+loadTex("wall2.png", "wall");
+loadTex("wall.png", "bg");
 loadTex("img.png", "kirby");
 loadTex("knight.png", "knight");
 gl.uniform1i(locGlobalTex, 0);
@@ -242,17 +265,22 @@ let clearMap = function(r, g, b) {
 		r = 0;
 		g = 1;
 		b = 0.5;
+		r = 0.8;
+		g = 1;
+		b = 1;
 	}
 	// Clear the color buffer bit
 	gl.clear(gl.COLOR_BUFFER_BIT);
 	// Clear the canvas
-	drawQuad(0, 0, map.w*side, map.h*side, r, g, b, 1, true);
+	drawQuad(0, 0, map.w*side, map.h*side, r, g, b, 1, true, "bg", 16);
 }
 
-let drawQuad = function(x1, y1, x2, y2, r, g, b, a, lit, tex) {
+let drawQuad = function(x1, y1, x2, y2, r, g, b, a, lit, tex, repeat) {
+	repeat = repeat || 1;
 	if (tex) {
 		setTex(tex);
 		gl.uniform1i(locTex, true);
+		gl.uniform1f(locRep, repeat);
 	} else {
 		gl.uniform1i(locTex, false);
 	}
