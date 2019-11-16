@@ -1,6 +1,7 @@
 let socket = new WebSocket("ws:"+document.URL.replace("http:","")+"socket");
 let PLAYERS = {};
 let map;
+let me;
 
 socket.onmessage = function(event) {
 	console.log(event.data);
@@ -12,8 +13,11 @@ socket.onmessage = function(event) {
 	} else if (data.type === "map") {
 		console.log(data);
 		map = data.data;
+		map.buffer = [];
 		setMap();
 		clearMap();
 		drawMap(map);
+	} else if (data.type === "me") {
+		me = data.data;
 	}
 }

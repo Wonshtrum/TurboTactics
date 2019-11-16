@@ -1,10 +1,17 @@
+let seed = 1;
+let random = function(s) {
+	seed = s || seed;
+    let x = Math.sin(seed++) * 10000;
+    return x - Math.floor(x);
+}
+
 let drawMap = function() {
 	for (let x=0 ; x<map.w ; x++) {
 		for (let y=0 ; y<map.h ; y++) {
 			let tile = map.map[x][y];
 			if (tile == 0) {
 			} else if (tile == 1) {
-				drawQuad(x*side, y*side, (x+1)*side, (y+1)*side, 1, 0.8, 0.8, 1, false, "wall");
+				drawQuad(x*side, y*side, (x+1)*side, (y+1)*side, 1, 0.8, 0.8, 1, false, "wall", 1);
 			} else if (tile == -1) {
 				drawQuad(x*side, y*side, (x+1)*side, (y+1)*side, 0, 0.5, 0.4, 1, true);
 			} else if (typeof(tile) == "string") {
@@ -12,9 +19,17 @@ let drawMap = function() {
 					drawQuad(x*side, y*side, (x+1)*side, (y+1)*side, 1, 1, 1, 1, true, "knight");
 				} else if (tile[0] == "M") {
 					drawQuad(x*side+4, y*side+8, (x+1)*side-4, (y+1)*side, 1, 1, 1, 1, true, "kirby");
+					drawQuad(x*side, y*side, (x+1)*side, (y+1)*side, 1, 1, 1, 1, true, "kirby", 1);
 				}
 			} else {
 				console.log("Unknow tile:", tile);
+			}
+		}
+	}
+	for (let layer of map.buffer) {
+		if (layer) {
+			for (let args of layer) {
+				drawQuad(...args);
 			}
 		}
 	}
@@ -51,37 +66,47 @@ let xyOnMapPixel = function(e) {
 }
 
 let drawCursor = function(x, y, r, g, b) {
-	drawQuad(x*side, y*side, x*side+1, y*side+1, r, g, b, 1, false);
-	drawQuad((x+1)*side, y*side, (x+1)*side-1, y*side+1, r, g, b, 1, false);
-	drawQuad(x*side, (y+1)*side, x*side+1, (y+1)*side-1, r, g, b, 1, false);
-	drawQuad((x+1)*side, (y+1)*side, (x+1)*side-1, (y+1)*side-1, r, g, b, 1, false);
+	map.buffer[1] = [[x*side, y*side, (x+1)*side, y*side+1, r, g, b, 1, false],
+	[(x+1)*side, y*side, (x+1)*side-1, (y+1)*side, r, g, b, 1, false],
+	[x*side, (y+1)*side, x*side+1, y*side, r, g, b, 1, false],
+	[(x+1)*side, (y+1)*side, x*side, (y+1)*side-1, r, g, b, 1, false]];
 }
 
 let mouseMove = function(e) {
-	clearMap();
 	let [x, y] = xyOnMapPixel(e);
-	gl.uniform2f(locLight, x, map.h*side-y);
+	let lights = [x, map.h*side-y, 2, 50, 50, 5];
+	gl.uniform1i(locNLights, lights.length/3);
+	gl.uniform3fv(locLights, lights);
 	[x ,y] = xyOnMap(e);
-	drawMap();
 	drawCursor(x, y, 1, 0, 0);
 }
 
 let mouseDown = function(e) {
-	clearMap();
+	map.buffer[0] = [];
 	let [x ,y] = xyOnMap(e);
 	let tile = map.map[x][y];
 	console.log(tile);
 	if (tile[0] === "P") {
 		let player = PLAYERS[tile];
 		console.log(player);
-		let paScale = player.pa+1;
+		let paScale = player.pa;
 		for (let [i, j, k] of paths(x, y)) {
-			drawQuad(i*side, j*side, (i+1)*side, (j+1)*side, 0+k/paScale,0.5+0.5*k/paScale,0.5+0.5*k/paScale, 1, false);
+			map.buffer[0].push([i*side, j*side, (i+1)*side, (j+1)*side, 0+1*k/paScale, 0.5+0.0*k/paScale, 0.5+0.5*k/paScale, 0.5, true]);
 		}
 	}
-	drawMap();
 	drawCursor(x, y, 0.5, 0, 0);
+}
+
+let time = 0;
+let timeStep = 0.1;
+let drawScene = function() {
+	time += timeStep*Math.random();
+	gl.uniform1f(locTime, time);
+	clearMap();
+	drawMap();
 }
 
 canvas.addEventListener("mousemove",mouseMove);
 canvas.addEventListener("mousedown",mouseDown);
+
+setInterval(()=>drawScene(), 30);

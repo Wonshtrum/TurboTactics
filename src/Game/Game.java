@@ -18,7 +18,7 @@ public class Game {
 			System.out.println(cmd+" "+args);
 			Player player = players.get(id);
 			if (cmd.equals("pos")) {
-				boolean valid = this.map.pathes(player.posX, player.posY).stream().anyMatch(t -> (t.x+","+t.y).equals(args));
+				boolean valid = this.map.paths(player.posX, player.posY).stream().anyMatch(t -> (t.x+","+t.y).equals(args));
 				player.sendMessage(typedData("msg", ""+valid));
 			}
 			//this.players.get(id).control(Integer.parseInt(data));
@@ -29,6 +29,7 @@ public class Game {
 	public void addPlayer(Player player) {
 		this.players.put(player.getId(), player);
 		this.broadcast(player.getId()+" joined");
+		player.sendMessage(typedData("me", "#P"+player.getId()+"#"));
 		if (this.players.size() >= 2) {
 			this.start();
 		}
