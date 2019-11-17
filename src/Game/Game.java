@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import Game.Entity.Player;
 import Game.Map.Air;
 import Game.Map.Map;
+import Utils.Triplet;
 
 public class Game {
 	private HashMap<String, Player> players;
@@ -21,9 +22,12 @@ public class Game {
 			String args = data.substring(data.indexOf(":")+1);
 			System.out.println(cmd+" "+args);
 			Player player = players.get(id);
-			if (cmd.equals("pos")) {
-				boolean valid = this.map.paths(player.posX, player.posY).stream().anyMatch(t -> (t.x+","+t.y).equals(args));
-				player.sendMessage(typedData("msg", ""+valid));
+			if (cmd.equals("move")) {
+				Triplet<Integer, Integer, Integer> pos = this.map.paths(player.posX, player.posY).stream().filter(t -> (t.x+","+t.y).equals(args)).findAny().orElse(null);
+				if (pos != null) {
+					player.move(pos.x, pos.y, pos.z);
+					this.broadcast("move", "[#P"+id+"#,"+pos+"]");
+				}
 			}
 			//this.players.get(id).control(Integer.parseInt(data));
 		} catch (Exception e) {

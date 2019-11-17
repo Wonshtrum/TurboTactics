@@ -43,10 +43,6 @@ let checkMap = function(x, y) {
 	}
 }
 
-let serverValidPos = function(x, y) {
-	socket.send("pos:"+x+","+y);
-}
-
 let clamp = function(x, a, b) {
 	return a>x?a:b<x?b:x;
 }
@@ -86,12 +82,21 @@ let mouseDown = function(e) {
 	let [x ,y] = xyOnMap(e);
 	let tile = map.map[x][y];
 	console.log(tile);
+	if (tile === 0 && me.paths.some(e => e[0]==x && e[1]==y)) {
+		let[nx, ny, _] = me.paths.filter(e => e[0]==x && e[1]==y)[0];
+		tryMove(nx, ny);
+	}
+	me.paths = [];
 	if (tile[0] === "P") {
 		let player = PLAYERS[tile];
 		console.log(player);
 		let paScale = player.pa;
-		for (let [i, j, k] of paths(x, y)) {
+		pos = paths(x, y);
+		for (let [i, j, k] of pos) {
 			map.buffer[0].push([i*side, j*side, (i+1)*side, (j+1)*side, 0+1*k/paScale, 0.5+0.0*k/paScale, 0.5+0.5*k/paScale, 0.5, true]);
+		}
+		if (tile == me.id) {
+			me.paths = pos;
 		}
 	}
 	drawCursor(x, y, 0.5, 0, 0);

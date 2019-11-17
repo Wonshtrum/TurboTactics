@@ -10,4 +10,9 @@ public class Triplet<T1, T2, T3> {
 		this.y = y;
 		this.z = z;
 	}
+	
+	@Override
+	public String toString() {
+		return x+","+y+","+z;
+	}
 }

@@ -6,7 +6,6 @@ import Game.Buffs.Buff;
 import Game.Items.Item;
 import Game.Map.Map;
 import Game.Map.Tile;
-import Game.Map.Wall;
 import Game.Skills.Skill;
 
 public abstract class Entity extends Tile {
@@ -177,15 +176,14 @@ public abstract class Entity extends Tile {
 		}
 	}
 	
-	public void move (int x, int y) {
-		this.map.move(this,x,y);
-		this.posX=x;
-		this.posY=y;
+	public void move (int x, int y, int pa) {
+		this.pa -= pa;
+		this.map.move(this, x, y);
 	}
 	
 	public String toString() {
-		int[] values = {lvl, xp, hpmax, mpmax, pamax, hp, mp, pa, intel, str, gold};
-		String[] names = {"lvl", "xp", "hpmax", "mpmax", "pamax", "hp", "mp", "pa", "intel", "str", "gold"};
+		int[] values = {posX, posY, lvl, xp, hpmax, mpmax, pamax, hp, mp, pa, intel, str, gold};
+		String[] names = {"x", "y", "lvl", "xp", "hpmax", "mpmax", "pamax", "hp", "mp", "pa", "intel", "str", "gold"};
 		int length = values.length;
 		String res = "";
 		for (int i=0 ; i<length ; i++) {

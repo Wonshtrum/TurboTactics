@@ -1,7 +1,7 @@
 let socket = new WebSocket("ws:"+document.URL.replace("http:","")+"socket");
 let PLAYERS = {};
 let map;
-let me;
+let me = {id:0, paths:[]};
 
 socket.onmessage = function(event) {
 	console.log(event.data);
@@ -18,6 +18,18 @@ socket.onmessage = function(event) {
 		clearMap();
 		drawMap(map);
 	} else if (data.type === "me") {
-		me = data.data;
+		me.id = data.data;
+	} else if (data.type === "move") {
+		let [id, x, y, pa] = data.data;
+		let player = PLAYERS[id];
+		map.map[player.x][player.y] = 0;
+		map.map[x][y] = id;
+		player.pa -= pa;
+		player.x = x;
+		player.y = y;
 	}
+}
+
+let tryMove = function(x, y) {
+	socket.send("move:"+x+","+y);
 }

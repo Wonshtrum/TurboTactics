@@ -52,7 +52,7 @@ public class Map {
 			}
 		}
 		place(width-2, height-2, new Mob(this));
-		tiles[width-1][height-1] = new Exit(height,width);
+		place(width-1, height-1, new Exit(0, 0));
 	}
 	
 	public int getWidth() {
@@ -88,8 +88,8 @@ public class Map {
 	}
 	
 	public void move(Entity target, int x, int y) {
-		this.tiles[target.posX][target.posY]=null;
-		this.tiles[x][y]=target;
+		this.place(target.posX, target.posY, new Air(0, 0));
+		this.place(x, y, target);
 	}
 	
 	
@@ -116,7 +116,7 @@ public class Map {
 					for (int j=-1 ; j<2 ; j++) {
 						int a = x+i;
 						int b = y+j;
-						if (i!=j && -i!=j && inBound(x+i, y+j) && tiles[x+i][y+j] == null && !visited.stream().anyMatch(t -> t.x == a && t.y == b)) {
+						if (i!=j && -i!=j && inBound(x+i, y+j) && tiles[x+i][y+j] instanceof Air && !visited.stream().anyMatch(t -> t.x == a && t.y == b)) {
 							visited.add(new Triplet<Integer, Integer, Integer>(x+i, y+j, pa+1));
 							newParents.add(new Triplet<Integer, Integer, Integer>(x+i, y+j, 0));
 						}
