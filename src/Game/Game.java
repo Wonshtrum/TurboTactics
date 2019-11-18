@@ -47,6 +47,7 @@ public class Game {
 	}
 		
 	public void addPlayer(Player player) {
+		System.out.println("added: "+player.getId());
 		this.players.put(player.getId(), player);
 		this.broadcast(player.getId()+" joined");
 		this.trySend(player, "me", "#P"+player.getId()+"#");
