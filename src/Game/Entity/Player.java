@@ -1,5 +1,7 @@
 package Game.Entity;
 
+import java.io.IOException;
+
 import javax.websocket.Session;
 
 import Game.Map.Map;
@@ -23,16 +25,16 @@ public class Player extends Entity {
 		return name;
 	}
 	
+	public void setPa(int pa) {
+		this.pa = pa;
+	}
+
 	public void setMap(Map map) {
 		this.map = map;
 	}
 	
-	public void sendMessage(String message) {
-		try {
-			this.session.getBasicRemote().sendText(message.replace("#", "\""));
-		} catch (Exception e) {
-			System.out.println("Illegal call ("+e+") for session "+this.getId());
-		}
+	public void sendMessage(String message) throws IOException {
+		this.session.getBasicRemote().sendText(message.replace("#", "\""));
 	}
 
 	@Override

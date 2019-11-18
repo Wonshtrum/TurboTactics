@@ -12,14 +12,14 @@ import Game.Manager;
 public class WebSocket {
     @OnOpen
     public void open(Session session) {
-    	System.out.println("open "+session);
+    	System.out.println("open "+session+" "+session.getId());
     	//TODO party number
     	Manager.getInstance().addPlayer(session, 0);
 	}
 	
 	@OnClose
     public void close(Session session) {
-    	System.out.println("close "+session);
+    	System.out.println("close "+session+" "+session.getId());
     	Manager.getInstance().removePlayer(session.getId());
 	}
 	

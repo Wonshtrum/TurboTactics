@@ -20,8 +20,9 @@ socket.onmessage = function(event) {
 	} else if (data.type === "me") {
 		me.id = data.data;
 	} else if (data.type === "move") {
-		let [id, x, y, pa] = data.data;
+		let [id, pa, path] = data.data;
 		let player = PLAYERS[id];
+		let [x, y] = path[0];
 		map.map[player.x][player.y] = 0;
 		map.map[x][y] = id;
 		player.pa -= pa;

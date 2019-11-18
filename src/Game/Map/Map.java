@@ -1,5 +1,6 @@
 package Game.Map;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -7,6 +8,7 @@ import Game.Entity.Entity;
 import Game.Entity.Mob;
 import Game.Entity.Player;
 import Game.Map.Exit;
+import Utils.Couple;
 import Utils.Tools;
 import Utils.Triplet;
 
@@ -101,31 +103,34 @@ public class Map {
 		return tiles[x][y];
 	}
 	
-	public HashSet<Triplet<Integer, Integer, Integer>> paths(int x, int y) {
+	public HashMap<Triplet<Integer, Integer, Integer>, Triplet<Integer, Integer, Integer>> paths(int x, int y) {
 		Entity entity = (Entity) tiles[x][y];
-		HashSet<Triplet<Integer, Integer, Integer>> visited = new HashSet<>();
+		HashSet<Couple<Integer, Integer>> visited = new HashSet<>();
 		HashSet<Triplet<Integer, Integer, Integer>> parents = new HashSet<>();
 		parents.add(new Triplet<Integer, Integer, Integer>(x, y, 0));
 		HashSet<Triplet<Integer, Integer, Integer>> newParents = new HashSet<>();
+		HashMap<Triplet<Integer, Integer, Integer>, Triplet<Integer, Integer, Integer>> tree = new HashMap<>();
 		for (int pa=0 ; pa<entity.getPa() && parents.size()>0 ; pa++) {
 			newParents.clear();
-			for (Triplet<Integer, Integer, Integer> triplet : parents) {
-				x = triplet.x;
-				y = triplet.y;
+			for (Triplet<Integer, Integer, Integer> node : parents) {
+				x = node.x;
+				y = node.y;
 				for (int i=-1 ; i<2 ; i++) {
 					for (int j=-1 ; j<2 ; j++) {
 						int a = x+i;
 						int b = y+j;
 						if (i!=j && -i!=j && inBound(x+i, y+j) && tiles[x+i][y+j] instanceof Air && !visited.stream().anyMatch(t -> t.x == a && t.y == b)) {
-							visited.add(new Triplet<Integer, Integer, Integer>(x+i, y+j, pa+1));
-							newParents.add(new Triplet<Integer, Integer, Integer>(x+i, y+j, 0));
+							visited.add(new Couple<Integer, Integer>(x+i, y+j));
+							Triplet<Integer, Integer, Integer> newNode = new Triplet<Integer, Integer, Integer>(x+i, y+j, pa+1);
+							newParents.add(newNode);
+							tree.put(newNode, node);
 						}
 					}
 				}
 			}
 			parents.addAll(newParents);
 		}
-		return visited;
+		return tree;
 	}
 		
 	public String toString() {

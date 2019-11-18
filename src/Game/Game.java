@@ -1,5 +1,6 @@
 package Game;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -7,6 +8,8 @@ import java.util.stream.Collectors;
 import Game.Entity.Player;
 import Game.Map.Air;
 import Game.Map.Map;
+import Utils.Couple;
+import Utils.Tools;
 import Utils.Triplet;
 
 public class Game {
@@ -20,36 +23,47 @@ public class Game {
 		try {
 			String cmd = data.substring(0, data.indexOf(":"));
 			String args = data.substring(data.indexOf(":")+1);
-			System.out.println(cmd+" "+args);
+			System.out.println(cmd+"->"+args);
 			Player player = players.get(id);
 			if (cmd.equals("move")) {
-				Triplet<Integer, Integer, Integer> pos = this.map.paths(player.posX, player.posY).stream().filter(t -> (t.x+","+t.y).equals(args)).findAny().orElse(null);
+				HashMap<Triplet<Integer, Integer, Integer>, Triplet<Integer, Integer, Integer>> tree = this.map.paths(player.posX, player.posY);
+				Triplet<Integer, Integer, Integer> pos = tree.keySet().stream().filter(t -> (t.x+","+t.y).equals(args)).findAny().orElse(null);
 				if (pos != null) {
+					ArrayList<Couple<Integer, Integer>> path = Tools.tracePath(tree, pos);
+					String result = "[";
+					for (int i = 0 ; i<pos.z ; i++) {
+						result += "["+path.get(i)+"]";
+						if (i < pos.z-1) {
+							result += ",";
+						}
+					}
 					player.move(pos.x, pos.y, pos.z);
-					this.broadcast("move", "[#P"+id+"#,"+pos+"]");
+					this.broadcast("move", "[#P"+id+"#,"+pos.z+","+result+"]]");
 				}
 			}
-			//this.players.get(id).control(Integer.parseInt(data));
 		} catch (Exception e) {
 			Manager.getInstance().removePlayer(id);
 		}
 	}
+		
 	public void addPlayer(Player player) {
 		this.players.put(player.getId(), player);
 		this.broadcast(player.getId()+" joined");
-		player.sendMessage(typedData("me", "#P"+player.getId()+"#"));
+		this.trySend(player, "me", "#P"+player.getId()+"#");
 		if (this.players.size() >= 2) {
 			this.start();
 		}
 	}
+	
 	public void removePlayer(String id) {
 		Player player = players.get(id);
 		this.map.place(player.posX, player.posY, new Air(0,0));
-		players.remove(id);
+		this.players.remove(id);
 		this.broadcast(id+" left");
 		this.broadcast("players", sendPlayers());
 		this.broadcast("map", map.toString());
 	}
+	
 	private String sendPlayers() {
 		String res = "{";
 		List<Player> playersList = players.values().stream().collect(Collectors.toList());
@@ -63,24 +77,42 @@ public class Game {
 		res += "}";
 		return res;
 	}
+
 	public void start() {
-		this.map = new Map(8,8,0,players.values().stream().collect(Collectors.toList()));
+		this.map = new Map(8, 8, 0, players.values().stream().collect(Collectors.toList()));
 		for (Player player : players.values()) {
+			player.setPa(player.getPamax());
 			player.setMap(this.map);
 		}
 		this.broadcast("start");
 		this.broadcast("map", map.toString());
 		this.broadcast("players", sendPlayers());
 	}
+	
 	public String typedData(String type, String data) {
 		return "{#type#:#"+type+"#,#data#:"+data+"}";
 	}
+	
+	public void trySend(Player player, String data) {
+		this.trySend(player, "msg", "#"+data+"#");
+	}
+	
+	public void trySend(Player player, String type, String data) {
+		try {
+			player.sendMessage(typedData(type, data));
+		} catch (Exception e) {
+			Manager.getInstance().removePlayer(player.getId());
+		}
+	}
+	
 	public void broadcast(String data) {
 		this.broadcast("msg", "#"+data+"#");
 	}
+	
 	public void broadcast(String type, String data) {
-		for (Player player : players.values()) {
-			player.sendMessage(typedData(type, data));
+		List<Player> playersList = this.players.values().stream().collect(Collectors.toList());
+		for (Player player : playersList) {
+			this.trySend(player, type, data);
 		}
 	}
 }
