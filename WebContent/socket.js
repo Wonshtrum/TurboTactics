@@ -14,6 +14,7 @@ socket.onmessage = function(event) {
 		console.log(data);
 		map = data.data;
 		map.buffer = [];
+		map.animate = [];
 		setMap();
 		clearMap();
 		drawMap(map);
@@ -24,10 +25,12 @@ socket.onmessage = function(event) {
 		let player = PLAYERS[id];
 		let [x, y] = path[0];
 		map.map[player.x][player.y] = 0;
-		map.map[x][y] = id;
 		player.pa -= pa;
+		path.push([player.x, player.y]);
 		player.x = x;
 		player.y = y;
+		//map.map[x][y] = id;
+		animateMultipleSteps([side, side, 1, 0, 0, 1, true, "knight"], path.reverse().map(e => [e[0]*side, e[1]*side]), side/2, [x, y, id]);
 	}
 }
 

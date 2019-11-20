@@ -16,13 +16,33 @@ let drawMap = function() {
 				drawQuad(x*side, y*side, (x+1)*side, (y+1)*side, 0, 0.5, 0.4, 1, true);
 			} else if (typeof(tile) == "string") {
 				if (tile[0] == "P") {
-					drawQuad(x*side, y*side, (x+1)*side, (y+1)*side, 1, 1, 1, 1, true, "knight");
+					if (tile == me.id) {
+						drawQuad(x*side, y*side, (x+1)*side, (y+1)*side, 1, 0, 0, 1, true, "knight");						
+					} else {
+						drawQuad(x*side, y*side, (x+1)*side, (y+1)*side, 1, 1, 1, 1, true, "knight");
+					}
 				} else if (tile[0] == "M") {
 					drawQuad(x*side+4, y*side+8, (x+1)*side-4, (y+1)*side, 1, 1, 1, 1, true, "kirby");
 					drawQuad(x*side, y*side, (x+1)*side, (y+1)*side, 1, 1, 1, 1, true, "kirby", 1);
 				}
 			} else {
 				console.log("Unknow tile:", tile);
+			}
+		}
+	}
+	for (let i = map.animate.length-1 ; i>=0 ; i--) {
+		args = map.animate[i];
+		drawQuad(args.x, args.y, args.x+args.w, args.y+args.h, ...args.quad);
+		args.x += args.dx;
+		args.y += args.dy;
+		if (args.steps-- <= 0) {
+			map.animate.splice(i, 1);
+			if (args.mat) {
+				let [x, y, tile] = args.mat;
+				map.map[x][y] = tile;
+			}
+			if (args.next) {
+				map.animate.push(args.next);
 			}
 		}
 	}
@@ -102,16 +122,49 @@ let mouseDown = function(e) {
 	drawCursor(x, y, 0.5, 0, 0);
 }
 
+let animate = function(quad, x, y, dx, dy, steps, mat, next) {
+	let [w, h] = quad.splice(0, 2);
+	map.animate.push({quad:quad, w:w, h:h, x:x, y:y, dx:dx/steps, dy:dy/steps, steps:steps, mat:mat, next:next});
+}
+
+let animateMultipleSteps = function(quad, path, allSteps, mat) {
+	let [w, h] = quad.splice(0, 2);
+	let anime = {};
+	let megaAnime = anime;
+	for (let i=0 ; i<path.length-1 ; i++) {
+		let [x, y, steps] = path[i];
+		let [x1, y1] = path[i+1];
+		steps = steps || allSteps;
+		anime.quad = quad;
+		anime.x = x;
+		anime.y = y;
+		anime.dx = (x1-x)/steps;
+		anime.dy = (y1-y)/steps;
+		anime.w = w;
+		anime.h = h;
+		anime.steps = steps;
+		if (i < path.length-2) {
+			anime.next = {};
+			anime = anime.next;
+		}
+	}
+	anime.mat = mat;
+	console.log(megaAnime);
+	map.animate.push(megaAnime);
+}
+
 let time = 0;
 let timeStep = 0.1;
 let drawScene = function() {
+	let start = Date.now();
 	time += timeStep*Math.random();
 	gl.uniform1f(locTime, time);
 	clearMap();
 	drawMap();
+	//console.log(Date.now()-start);
 }
 
 canvas.addEventListener("mousemove",mouseMove);
 canvas.addEventListener("mousedown",mouseDown);
 
-setInterval(()=>drawScene(), 30);
+setInterval(()=>drawScene(), 20);
