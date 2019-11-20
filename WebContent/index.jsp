@@ -12,6 +12,7 @@
 <body>
 	<canvas id="myCan" width=50 height=50></canvas>
 	<div id="chat"></div>
+	<button onclick="endTurn()">Fin</button>
 </body>
 
 <script src="socket.js" type="text/javascript"></script>

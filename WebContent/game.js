@@ -122,12 +122,15 @@ let mouseDown = function(e) {
 	drawCursor(x, y, 0.5, 0, 0);
 }
 
-let animate = function(quad, x, y, dx, dy, steps, mat, next) {
+let animate = function(id, quad, x, y, dx, dy, steps, mat, next) {
 	let [w, h] = quad.splice(0, 2);
-	map.animate.push({quad:quad, w:w, h:h, x:x, y:y, dx:dx/steps, dy:dy/steps, steps:steps, mat:mat, next:next});
+	if (id) {
+		map.animate = map.animate.filter(e => e.id!=id);
+	}
+	map.animate.push({id:id, quad:quad, w:w, h:h, x:x, y:y, dx:dx/steps, dy:dy/steps, steps:steps, mat:mat, next:next});
 }
 
-let animateMultipleSteps = function(quad, path, allSteps, mat) {
+let animateMultipleSteps = function(id, quad, path, allSteps, mat) {
 	let [w, h] = quad.splice(0, 2);
 	let anime = {};
 	let megaAnime = anime;
@@ -135,6 +138,7 @@ let animateMultipleSteps = function(quad, path, allSteps, mat) {
 		let [x, y, steps] = path[i];
 		let [x1, y1] = path[i+1];
 		steps = steps || allSteps;
+		anime.id = id;
 		anime.quad = quad;
 		anime.x = x;
 		anime.y = y;
@@ -149,7 +153,9 @@ let animateMultipleSteps = function(quad, path, allSteps, mat) {
 		}
 	}
 	anime.mat = mat;
-	console.log(megaAnime);
+	if (id) {
+		map.animate = map.animate.filter(e => e.id!=id);
+	}
 	map.animate.push(megaAnime);
 }
 
@@ -163,8 +169,3 @@ let drawScene = function() {
 	drawMap();
 	//console.log(Date.now()-start);
 }
-
-canvas.addEventListener("mousemove",mouseMove);
-canvas.addEventListener("mousedown",mouseDown);
-
-setInterval(()=>drawScene(), 20);

@@ -17,7 +17,7 @@ socket.onmessage = function(event) {
 		map.animate = [];
 		setMap();
 		clearMap();
-		drawMap(map);
+		start();
 	} else if (data.type === "me") {
 		me.id = data.data;
 	} else if (data.type === "move") {
@@ -30,10 +30,22 @@ socket.onmessage = function(event) {
 		player.x = x;
 		player.y = y;
 		//map.map[x][y] = id;
-		animateMultipleSteps([side, side, 1, 0, 0, 1, true, "knight"], path.reverse().map(e => [e[0]*side, e[1]*side]), side/2, [x, y, id]);
+		animateMultipleSteps(id, [side, side, 1, 0, 0, 1, true, "knight"], path.reverse().map(e => [e[0]*side, e[1]*side]), side/2, [x, y, id]);
 	}
 }
 
 let tryMove = function(x, y) {
 	socket.send("move:"+x+","+y);
+}
+
+let endTurn = function() {
+	socket.send("endTurn:");
+}
+
+let gameLoop;
+let start = function() {
+	clearInterval(gameLoop);
+	canvas.addEventListener("mousemove",mouseMove);
+	canvas.addEventListener("mousedown",mouseDown);
+	gameLoop = setInterval(()=>drawScene(), 20);
 }
