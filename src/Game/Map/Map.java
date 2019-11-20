@@ -1,8 +1,10 @@
 package Game.Map;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.SortedSet;
 
 import Game.Entity.Entity;
 import Game.Entity.Mob;
@@ -17,6 +19,7 @@ public class Map {
 	private int height;
 	private int floor;
 	private Tile[][] tiles;
+	public SortedList sortedEntityOrder;
 	
 	public Map(int width, int height, int floor, List<Player> players) {
 		super();
@@ -24,6 +27,8 @@ public class Map {
 		this.height = height;
 		this.floor = floor;
 		this.tiles = new Tile[width][height];
+
+		ArrayList<Entity> entityOrder = new ArrayList<Entity>();
 		//Spawn players
 		for (int x=0 ; x<width ; x++) {
 			for (int y=0 ; y<height ; y++) {
@@ -39,22 +44,30 @@ public class Map {
 			switch (i) {
 				case 0:
 					place(1, 1, players.get(0));
+					entityOrder.add(players.get(0));
 					break;
 				case 1:
 					place(0, 1, players.get(1));
+					entityOrder.add(players.get(1));
 					break;
 				case 2:
 					place(1, 0, players.get(2));
+					entityOrder.add(players.get(2));
 					break;
 				case 3:
 					place(0, 0, players.get(3));
+					entityOrder.add(players.get(3));
 					break;
 				default:
 					break;
 			}
 		}
-		place(width-2, height-2, new Mob(this));
+		Mob monstreTest = new Mob(this);
+		place(width-2, height-2, monstreTest);
+		entityOrder.add(monstreTest);
 		place(width-1, height-1, new Exit(0, 0));
+		this.sortedEntityOrder = new SortedList(entityOrder);
+		
 	}
 	
 	public int getWidth() {

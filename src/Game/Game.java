@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import Game.Entity.Player;
-import Game.Map.Air;
 import Game.Map.Map;
 import Utils.Couple;
 import Utils.Tools;
@@ -25,21 +24,32 @@ public class Game {
 			String args = data.substring(data.indexOf(":")+1);
 			System.out.println(cmd+"->"+args);
 			Player player = players.get(id);
-			if (cmd.equals("move")) {
-				HashMap<Triplet<Integer, Integer, Integer>, Triplet<Integer, Integer, Integer>> tree = this.map.paths(player.posX, player.posY);
-				Triplet<Integer, Integer, Integer> pos = tree.keySet().stream().filter(t -> (t.x+","+t.y).equals(args)).findAny().orElse(null);
-				if (pos != null) {
-					ArrayList<Couple<Integer, Integer>> path = Tools.tracePath(tree, pos);
-					String result = "[";
-					for (int i = 0 ; i<pos.z ; i++) {
-						result += "["+path.get(i)+"]";
-						if (i < pos.z-1) {
-							result += ",";
+			switch(cmd) {
+			case "move":
+				if(map.sortedEntityOrder.isTurn(player)) {
+					HashMap<Triplet<Integer, Integer, Integer>, Triplet<Integer, Integer, Integer>> tree = this.map.paths(player.posX, player.posY);
+					Triplet<Integer, Integer, Integer> pos = tree.keySet().stream().filter(t -> (t.x+","+t.y).equals(args)).findAny().orElse(null);
+					if (pos != null) {
+						ArrayList<Couple<Integer, Integer>> path = Tools.tracePath(tree, pos);
+						String result = "[";
+						for (int i = 0 ; i<pos.z ; i++) {
+							result += "["+path.get(i)+"]";
+							if (i < pos.z-1) {
+								result += ",";
+							}
 						}
+						player.move(pos.x, pos.y, pos.z);
+						this.broadcast("move", "[#P"+id+"#,"+pos.z+","+result+"]]");
 					}
-					player.move(pos.x, pos.y, pos.z);
-					this.broadcast("move", "[#P"+id+"#,"+pos.z+","+result+"]]");
+				}	
+				break;
+			case "endTurn":
+				if(map.sortedEntityOrder.isTurn(player)) {
+					map.sortedEntityOrder.next();
 				}
+				break;
+			default:
+				break;
 			}
 		} catch (Exception e) {
 			Manager.getInstance().removePlayer(id);
@@ -57,7 +67,7 @@ public class Game {
 	
 	public void removePlayer(String id) {
 		Player player = players.get(id);
-		this.map.place(player.posX, player.posY, new Air(0,0));
+		player.die();
 		this.players.remove(id);
 		this.broadcast(id+" left");
 		this.broadcast("players", sendPlayers());

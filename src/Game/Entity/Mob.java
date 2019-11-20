@@ -11,4 +11,8 @@ public class Mob extends Entity {
 	public String toString() {
 		return "M";
 	}
+	
+	public void play() {
+		System.out.println("Come over here!");
+	}
 }

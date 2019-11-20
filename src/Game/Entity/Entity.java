@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import Game.Buffs.Buff;
 import Game.Items.Item;
+import Game.Map.Air;
 import Game.Map.Map;
 import Game.Map.Tile;
 import Game.Skills.Skill;
@@ -15,7 +16,8 @@ public abstract class Entity extends Tile {
 	protected int pa;
 	protected int hpmax;
 	protected int mpmax;
-	protected int pamax;	
+	protected int pamax;
+	public int initiative;
 	protected boolean alive;
 	protected int lvl;
 	protected int xp;
@@ -38,6 +40,7 @@ public abstract class Entity extends Tile {
 		this.hp=hpmax;
 		this.mp=mpmax;
 		this.pa=pamax;
+		this.initiative=0;
 		this.intel=5;
 		this.str=5;	
 		this.gold=0;
@@ -135,6 +138,8 @@ public abstract class Entity extends Tile {
 	
 	public void die() {
 		alive=false;
+		this.map.place(this.posX,this.posY, new Air(0,0));
+		this.map.sortedEntityOrder.remove(this);
 	}
 	
 	public void gainXp(int sum) {		
@@ -202,5 +207,15 @@ public abstract class Entity extends Tile {
 	public void removeBuff(Buff buff) {
 		this.buffs.remove(buff);
 	}
+	
+	public void beginTurn() {
+		System.out.println("Début du tour " + this.id);
+		//todo appliquer les buffs
+	}
+	
+	public void endTurn() {
+		this.pa=this.pamax;
+	}
+	
 	
 }
