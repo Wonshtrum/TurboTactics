@@ -209,7 +209,7 @@ public abstract class Entity extends Tile {
 	}
 	
 	public void beginTurn() {
-		System.out.println("Début du tour " + this.id);
+		System.out.println("Starting Turn" + this.id);
 		//todo appliquer les buffs
 	}
 	
