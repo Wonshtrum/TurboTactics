@@ -1,6 +1,7 @@
 let socket = new WebSocket("ws:"+document.URL.replace("http:","")+"socket");
 let PLAYERS = {};
 let map;
+let target;
 let me = {id:0, paths:[]};
 
 socket.onmessage = function(event) {
@@ -21,6 +22,8 @@ socket.onmessage = function(event) {
 	} else if (data.type === "me") {
 		me.id = data.data;
 	} else if (data.type === "move") {
+		me.paths = [];
+		map.buffer[0] = [];
 		let [id, pa, path] = data.data;
 		let player = PLAYERS[id];
 		let [x, y] = path[0];
@@ -31,6 +34,15 @@ socket.onmessage = function(event) {
 		player.y = y;
 		//map.map[x][y] = id;
 		animateMultipleSteps(id, [side, side, 1, 0, 0, 1, true, "knight"], path.reverse().map(e => [e[0]*side, e[1]*side]), side/2, [x, y, id]);
+	} else if (data.type === "end") {
+		let player = PLAYERS[data.data];
+		player.pa = player.pamax;
+		mouseDown();
+	} else if (data.type === "rm") {
+		let player  = PLAYERS[data.data];
+		map.map[player.x][player.y] = 0;
+		delete PLAYERS[data.data];
+		mouseDown();
 	}
 }
 

@@ -8,8 +8,6 @@ import java.util.stream.Collectors;
 import Game.Entity.Player;
 import Game.Map.Map;
 import Utils.Couple;
-import Utils.Tools;
-import Utils.Triplet;
 
 public class Game {
 	private HashMap<String, Player> players;
@@ -21,30 +19,36 @@ public class Game {
 		System.out.println(data);
 		try {
 			String cmd = data.substring(0, data.indexOf(":"));
-			String args = data.substring(data.indexOf(":")+1);
-			System.out.println(cmd+"->"+args);
+			String[] args = data.substring(data.indexOf(":")+1).split(",");
+			String argsString = "";
+			for (String arg : args) {
+				argsString += " "+arg;
+			}
+			System.out.println(cmd+"->"+argsString);
 			Player player = players.get(id);
 			switch(cmd) {
 			case "move":
+				int gx = Integer.parseInt(args[0]);
+				int gy = Integer.parseInt(args[1]);
 				if(map.sortedEntityOrder.isTurn(player)) {
-					HashMap<Triplet<Integer, Integer, Integer>, Triplet<Integer, Integer, Integer>> tree = this.map.paths(player.posX, player.posY);
-					Triplet<Integer, Integer, Integer> pos = tree.keySet().stream().filter(t -> (t.x+","+t.y).equals(args)).findAny().orElse(null);
-					if (pos != null) {
-						ArrayList<Couple<Integer, Integer>> path = Tools.tracePath(tree, pos);
+					ArrayList<Couple<Integer, Integer>> path = this.map.path(player.posX, player.posY, gx, gy, player.getPa());
+					if (path != null) {
 						String result = "[";
-						for (int i = 0 ; i<pos.z ; i++) {
+						int pa = path.size();
+						for (int i = 0 ; i<pa ; i++) {
 							result += "["+path.get(i)+"]";
-							if (i < pos.z-1) {
+							if (i < pa-1) {
 								result += ",";
 							}
 						}
-						player.move(pos.x, pos.y, pos.z);
-						this.broadcast("move", "[#P"+id+"#,"+pos.z+","+result+"]]");
+						player.move(gx, gy, pa);
+						this.broadcast("move", "[#"+player+"#,"+pa+","+result+"]]");
 					}
 				}	
 				break;
 			case "endTurn":
 				if(map.sortedEntityOrder.isTurn(player)) {
+					this.broadcast("end", "#"+player+"#");
 					map.sortedEntityOrder.next();
 				}
 				break;
@@ -57,13 +61,10 @@ public class Game {
 	}
 		
 	public void addPlayer(Player player) {
-		System.out.println("added: "+player.getId());
 		this.players.put(player.getId(), player);
 		this.broadcast(player.getId()+" joined");
-		this.trySend(player, "me", "#P"+player.getId()+"#");
-		if (this.players.size() >= 2) {
-			this.start();
-		}
+		this.trySend(player, "me", "#"+player+"#");
+		this.start();
 	}
 	
 	public void removePlayer(String id) {
@@ -71,8 +72,7 @@ public class Game {
 		player.die();
 		this.players.remove(id);
 		this.broadcast(id+" left");
-		this.broadcast("players", sendPlayers());
-		this.broadcast("map", map.toString());
+		this.broadcast("rm", "#"+player+"#");
 	}
 	
 	private String sendPlayers() {

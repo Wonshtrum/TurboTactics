@@ -3,8 +3,7 @@ package Game.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.SortedSet;
+import java.util.List;	
 
 import Game.Entity.Entity;
 import Game.Entity.Mob;
@@ -116,14 +115,13 @@ public class Map {
 		return tiles[x][y];
 	}
 	
-	public HashMap<Triplet<Integer, Integer, Integer>, Triplet<Integer, Integer, Integer>> paths(int x, int y) {
-		Entity entity = (Entity) tiles[x][y];
+	public Couple<HashMap<Triplet<Integer, Integer, Integer>, Triplet<Integer, Integer, Integer>>, Triplet<Integer, Integer, Integer>> range(int x, int y, int gx, int gy, int pamax) {
 		HashSet<Couple<Integer, Integer>> visited = new HashSet<>();
 		HashSet<Triplet<Integer, Integer, Integer>> parents = new HashSet<>();
 		parents.add(new Triplet<Integer, Integer, Integer>(x, y, 0));
 		HashSet<Triplet<Integer, Integer, Integer>> newParents = new HashSet<>();
 		HashMap<Triplet<Integer, Integer, Integer>, Triplet<Integer, Integer, Integer>> tree = new HashMap<>();
-		for (int pa=0 ; pa<entity.getPa() && parents.size()>0 ; pa++) {
+		for (int pa=0 ; pa<pamax && parents.size()>0 ; pa++) {
 			newParents.clear();
 			for (Triplet<Integer, Integer, Integer> node : parents) {
 				x = node.x;
@@ -137,15 +135,29 @@ public class Map {
 							Triplet<Integer, Integer, Integer> newNode = new Triplet<Integer, Integer, Integer>(x+i, y+j, pa+1);
 							newParents.add(newNode);
 							tree.put(newNode, node);
+							if (x+i == gx && y+j == gy) {
+								return new Couple<HashMap<Triplet<Integer, Integer, Integer>, Triplet<Integer, Integer, Integer>>, Triplet<Integer, Integer, Integer>>(tree, newNode);
+							}
 						}
 					}
 				}
 			}
 			parents.addAll(newParents);
 		}
-		return tree;
+		return null;
 	}
-		
+	
+	public ArrayList<Couple<Integer, Integer>> path(int x, int y, int gx, int gy, int pamax) {
+		Couple<HashMap<Triplet<Integer, Integer, Integer>, Triplet<Integer, Integer, Integer>>, Triplet<Integer, Integer, Integer>> res = this.range(x, y, gx, gy, pamax);
+		if (res != null) {
+			HashMap<Triplet<Integer, Integer, Integer>, Triplet<Integer, Integer, Integer>> tree = res.x;
+			Triplet<Integer, Integer, Integer> pos = res.y;
+			return Tools.tracePath(tree, pos);
+		} else {
+			return null;
+		}
+	}
+
 	public String toString() {
 		String res = "{#w#:"+width+",#h#:"+height+",#map#:[";
 		for (int x=0 ; x<this.width ; x++) {

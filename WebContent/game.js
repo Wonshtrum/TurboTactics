@@ -40,6 +40,7 @@ let drawMap = function() {
 			if (args.mat) {
 				let [x, y, tile] = args.mat;
 				map.map[x][y] = tile;
+				mouseDown();
 			}
 			if (args.next) {
 				map.animate.push(args.next);
@@ -98,6 +99,8 @@ let mouseMove = function(e) {
 }
 
 let mouseDown = function(e) {
+	e = e || target;
+	target = e;
 	map.buffer[0] = [];
 	let [x ,y] = xyOnMap(e);
 	let tile = map.map[x][y];
