@@ -245,7 +245,7 @@ let setTex = function(index) {
 loadTex("wall2.png", "wall");
 loadTex("wall.png", "bg");
 loadTex("img.png", "kirby");
-loadTex("knight.png", "knight");
+loadTex("knightIdle2.png", "knight");
 gl.uniform1i(locGlobalTex, 0);
 
 /*============= Drawing the Quad ================*/

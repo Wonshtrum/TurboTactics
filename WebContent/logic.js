@@ -1,5 +1,5 @@
 let paths = function(x, y) {
-	let entity = PLAYERS[map.map[x][y]];
+	let entity = entities[map.map[x][y]];
 	let visited = [];
 	let parents = [[x, y]];
 	let newParents;

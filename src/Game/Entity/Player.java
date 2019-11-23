@@ -13,7 +13,7 @@ public class Player extends Entity {
 	public Player (String name, Session session) {
 		super(null);
 		this.session=session;
-		this.setId(session.getId());
+		this.setId("P"+session.getId());
 		this.name=name;
 	}
 
@@ -35,13 +35,5 @@ public class Player extends Entity {
 	
 	public void sendMessage(String message) throws IOException {
 		this.session.getBasicRemote().sendText(message.replace("#", "\""));
-	}
-
-	@Override
-	public String toString() {
-		return "P"+this.id;
-	}
-	public String fullData() {
-		return "#P"+this.id+"#:{"+super.toString()+"}";
 	}
 }

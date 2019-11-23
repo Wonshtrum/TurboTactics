@@ -3,8 +3,9 @@ package Game.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;	
+import java.util.List;
 
+import Game.Game;
 import Game.Entity.Entity;
 import Game.Entity.Mob;
 import Game.Entity.Player;
@@ -18,9 +19,9 @@ public class Map {
 	private int height;
 	private int floor;
 	private Tile[][] tiles;
-	public SortedList sortedEntityOrder;
+	public TurnManager sortedEntityOrder;
 	
-	public Map(int width, int height, int floor, List<Player> players) {
+	public Map(int width, int height, int floor, List<Player> players, Game game) {
 		super();
 		this.width = width;
 		this.height = height;
@@ -65,7 +66,7 @@ public class Map {
 		place(width-2, height-2, monstreTest);
 		entityOrder.add(monstreTest);
 		place(width-1, height-1, new Exit(0, 0));
-		this.sortedEntityOrder = new SortedList(entityOrder);
+		this.sortedEntityOrder = new TurnManager(entityOrder, game);
 		
 	}
 	
@@ -115,7 +116,7 @@ public class Map {
 		return tiles[x][y];
 	}
 	
-	public Couple<HashMap<Triplet<Integer, Integer, Integer>, Triplet<Integer, Integer, Integer>>, Triplet<Integer, Integer, Integer>> range(int x, int y, int gx, int gy, int pamax) {
+	public Couple<HashMap<Triplet<Integer, Integer, Integer>, Triplet<Integer, Integer, Integer>>, Triplet<Integer, Integer, Integer>> range(int x, int y, int gx, int gy, int pamax, boolean goalEmpty) {
 		HashSet<Couple<Integer, Integer>> visited = new HashSet<>();
 		HashSet<Triplet<Integer, Integer, Integer>> parents = new HashSet<>();
 		parents.add(new Triplet<Integer, Integer, Integer>(x, y, 0));
@@ -130,12 +131,16 @@ public class Map {
 					for (int j=-1 ; j<2 ; j++) {
 						int a = x+i;
 						int b = y+j;
-						if (i!=j && -i!=j && inBound(x+i, y+j) && tiles[x+i][y+j] instanceof Air && !visited.stream().anyMatch(t -> t.x == a && t.y == b)) {
-							visited.add(new Couple<Integer, Integer>(x+i, y+j));
-							Triplet<Integer, Integer, Integer> newNode = new Triplet<Integer, Integer, Integer>(x+i, y+j, pa+1);
-							newParents.add(newNode);
-							tree.put(newNode, node);
-							if (x+i == gx && y+j == gy) {
+						if (i!=j && -i!=j && inBound(x+i, y+j) && !visited.stream().anyMatch(t -> t.x == a && t.y == b)) {
+							boolean empty = tiles[x+i][y+j] instanceof Air;
+							Triplet<Integer, Integer, Integer> newNode = node;
+							if (empty) {
+								visited.add(new Couple<Integer, Integer>(x+i, y+j));
+								newNode = new Triplet<Integer, Integer, Integer>(x+i, y+j, pa+1);
+								newParents.add(newNode);
+								tree.put(newNode, node);
+							}
+							if (x+i == gx && y+j == gy && (empty || !goalEmpty)) {
 								return new Couple<HashMap<Triplet<Integer, Integer, Integer>, Triplet<Integer, Integer, Integer>>, Triplet<Integer, Integer, Integer>>(tree, newNode);
 							}
 						}
@@ -147,8 +152,8 @@ public class Map {
 		return null;
 	}
 	
-	public ArrayList<Couple<Integer, Integer>> path(int x, int y, int gx, int gy, int pamax) {
-		Couple<HashMap<Triplet<Integer, Integer, Integer>, Triplet<Integer, Integer, Integer>>, Triplet<Integer, Integer, Integer>> res = this.range(x, y, gx, gy, pamax);
+	public ArrayList<Couple<Integer, Integer>> path(int x, int y, int gx, int gy, int pamax, boolean goalEmpty) {
+		Couple<HashMap<Triplet<Integer, Integer, Integer>, Triplet<Integer, Integer, Integer>>, Triplet<Integer, Integer, Integer>> res = this.range(x, y, gx, gy, pamax, goalEmpty);
 		if (res != null) {
 			HashMap<Triplet<Integer, Integer, Integer>, Triplet<Integer, Integer, Integer>> tree = res.x;
 			Triplet<Integer, Integer, Integer> pos = res.y;

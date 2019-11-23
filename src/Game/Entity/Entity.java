@@ -186,7 +186,12 @@ public abstract class Entity extends Tile {
 		this.map.move(this, x, y);
 	}
 	
+	@Override
 	public String toString() {
+		return this.id;
+	}
+	
+	public String mapAttribute() {
 		int[] values = {posX, posY, lvl, xp, hpmax, mpmax, pamax, hp, mp, pa, intel, str, gold};
 		String[] names = {"x", "y", "lvl", "xp", "hpmax", "mpmax", "pamax", "hp", "mp", "pa", "intel", "str", "gold"};
 		int length = values.length;
@@ -198,6 +203,10 @@ public abstract class Entity extends Tile {
 			}
 		}
 		return res;
+	}
+	
+	public String fullData() {
+		return "#"+this+"#:{"+this.mapAttribute()+"}";
 	}
 	
 	public void getBuff(Buff buff) {
@@ -216,6 +225,5 @@ public abstract class Entity extends Tile {
 	public void endTurn() {
 		this.pa=this.pamax;
 	}
-	
-	
+
 }
