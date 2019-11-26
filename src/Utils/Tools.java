@@ -2,6 +2,7 @@ package Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class Tools {
 	static public int randInt(int a, int b) {
@@ -27,5 +28,17 @@ public class Tools {
 			pos = tree.get(pos);
 		}
 		return result;
+	}
+	
+	static public String pathToString(List<Couple<Integer, Integer>> path) {
+		String result = "[";
+		int pa = path.size();
+		for (int i = 0 ; i<pa ; i++) {
+			result += "["+path.get(i)+"]";
+			if (i < pa-1) {
+				result += ",";
+			}
+		}
+		return result+"]";
 	}
 }

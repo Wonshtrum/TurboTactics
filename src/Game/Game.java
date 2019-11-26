@@ -5,10 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import Game.Entity.Entity;
 import Game.Entity.Player;
 import Game.Map.Map;
 import Utils.Couple;
 import Utils.Stats;
+import Utils.Tools;
 
 public class Game {
 	private HashMap<String, Player> players;
@@ -32,20 +34,13 @@ public class Game {
 				int gx = Integer.parseInt(args[0]);
 				int gy = Integer.parseInt(args[1]);
 				if(map.sortedEntityOrder.isTurn(player)) {
-					ArrayList<Couple<Integer, Integer>> path = this.map.path(player.posX, player.posY, gx, gy, player.getStat(Stats.pa));
+					ArrayList<Couple<Integer, Integer>> path = this.map.path(player.posX, player.posY, gx, gy, player.getStat(Stats.pa), true);
 					if (path != null) {
-						String result = "[";
 						int pa = path.size();
-						for (int i = 0 ; i<pa ; i++) {
-							result += "["+path.get(i)+"]";
-							if (i < pa-1) {
-								result += ",";
-							}
-						}
 						player.move(gx, gy, pa);
-						this.broadcast("move", "[#"+player+"#,"+pa+","+result+"]]");
+						this.broadcast("move", "[#"+player+"#,"+player.getStat(Stats.pa)+","+Tools.pathToString(path)+"]");
 					}
-				}	
+				}
 				break;
 			case "attack":
 				if (map.sortedEntityOrder.isTurn(player)) {
@@ -61,7 +56,11 @@ public class Game {
 			case "endTurn":
 				if (map.sortedEntityOrder.isTurn(player)) {
 					this.broadcast("end", "#"+player+"#");
-					map.sortedEntityOrder.next();
+					try {
+						map.sortedEntityOrder.next();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 				break;
 			default:
@@ -73,7 +72,7 @@ public class Game {
 	}
 		
 	public void addPlayer(Player player) {
-		this.players.put(player.getId(), player);
+		this.players.put(player.getSession().getId(), player);
 		this.broadcast(player.getId()+" joined");
 		this.trySend(player, "me", "#"+player+"#");
 		this.start();
@@ -87,12 +86,13 @@ public class Game {
 		this.broadcast("rm", "#"+player+"#");
 	}
 	
-	private String sendPlayers() {
+	private String sendEntities() {
 		String res = "{";
-		List<Player> playersList = players.values().stream().collect(Collectors.toList());
-		int length = playersList.size();
+		List<Entity> entityList = this.map.sortedEntityOrder.entities;
+		int length = entityList.size();
+		System.out.println(length);
 		for (int i=0 ; i<length ; i++) {
-			res += playersList.get(i).fullData();
+			res += entityList.get(i).fullData();
 			if (i<length-1) {
 				res += ",";
 			}
@@ -102,14 +102,14 @@ public class Game {
 	}
 
 	public void start() {
-		this.map = new Map(8, 8, 0, players.values().stream().collect(Collectors.toList()));
+		this.map = new Map(8, 8, 0, players.values().stream().collect(Collectors.toList()), this);
 		for (Player player : players.values()) {
 			player.setStat(Stats.pa, player.getStat(Stats.paMax));
 			player.setMap(this.map);
 		}
 		this.broadcast("start");
-		this.broadcast("map", map.toString());
-		this.broadcast("players", sendPlayers());
+		this.broadcast("map", this.map.toString());
+		this.broadcast("entities", this.sendEntities());
 	}
 	
 	public String typedData(String type, String data) {

@@ -107,7 +107,12 @@ public abstract class Entity extends Tile {
 		this.map.move(this, x, y);
 	}
 	
+	@Override
 	public String toString() {
+		return this.id;
+	}
+
+	public String mapAttribute() {
 		String[] names = {"hp", "mp", "pa", "hpMax", "mpMax", "paMax", "armor", "initiative", "level", "xp", "intel", "str", "dext", "gold"};
 		int length = this.stats.length;
 		String res = "#x#:"+posX+",#y#:"+posY+",";
@@ -118,6 +123,10 @@ public abstract class Entity extends Tile {
 			}
 		}
 		return res;
+	}
+	
+	public String fullData() {
+		return "#"+this+"#:{"+this.mapAttribute()+"}";
 	}
 	
 	

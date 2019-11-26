@@ -14,7 +14,7 @@ public class Player extends Entity {
 		//String id, int hpMax, int mpMax, int paMax, int armor, int initiative, int level, int xp, int intel, int str, int dext, int gold, Map map
 		super(session.getId(), 20, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0,null);
 		this.session=session;
-		this.setId(session.getId());
+		this.setId("P"+session.getId());
 		this.name=name;
 	}
 
@@ -32,13 +32,5 @@ public class Player extends Entity {
 	
 	public void sendMessage(String message) throws IOException {
 		this.session.getBasicRemote().sendText(message.replace("#", "\""));
-	}
-
-	@Override
-	public String toString() {
-		return "P"+this.id;
-	}
-	public String fullData() {
-		return "#P"+this.id+"#:{"+super.toString()+"}";
 	}
 }

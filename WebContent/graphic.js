@@ -8,12 +8,9 @@ gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 /*========== Defining and storing the geometry =========*/
 
 const side = 16;
-const width = 8*side;
-const height = 8*side;
-const width2 = (width/2).toFixed(1);
-const height2 = (width/2).toFixed(1);
-canvas.width = width;
-canvas.height = height;
+let width;
+let height;
+
 let vertices = [
     0,1,0,
     0,0,0,
@@ -64,11 +61,17 @@ attribute vec2 a_texcoord;
 varying vec3 v_position;
 varying vec2 v_texcoord;
 uniform vec4 u_size;
+uniform float u_width2;
+uniform float u_height2;
+varying float v_width2;
+varying float v_height2;
 void main(void) {
-	vec3 pos = vec3((a_position.x*(u_size[2]-u_size[0])+u_size[0])/${width2}-1.0, (a_position.y*(u_size[1]-u_size[3])-u_size[1])/${height2}+1.0, a_position.z);
+	vec3 pos = vec3((a_position.x*(u_size[2]-u_size[0])+u_size[0])/u_width2-1.0, (a_position.y*(u_size[1]-u_size[3])-u_size[1])/u_height2+1.0, a_position.z);
 	gl_Position = vec4(pos, 1);
 	v_position  = pos;
 	v_texcoord  = a_texcoord;
+	v_width2 = u_width2;
+	v_height2 = u_height2;
 }`;
 
 // Create a vertex shader object
@@ -85,6 +88,11 @@ let fragCode =
 `precision mediump float;
 varying vec3 v_position;
 varying vec2 v_texcoord;
+varying float v_width2;
+varying float v_height2;
+uniform int u_width;
+uniform int u_height;
+uniform int u_side;
 uniform float u_time;
 uniform vec4 u_color;
 uniform bool u_lit;
@@ -93,9 +101,9 @@ uniform vec3 u_lights[100];
 uniform int u_nlights;
 uniform sampler2D u_texture;
 uniform float u_repeat;
-uniform int u_mat[100];
-int mat(int x, int y) {for (int i=0 ; i<64 ; i++) {if (i==7-y+8*x) {return u_mat[i];}};return 0;}
-int mat_(int x, int y, bool r) {return r?mat(y/${side},x/${side}):mat(x/${side},y/${side});}
+uniform int u_mat[1024];
+int mat(int x, int y) {for (int i=0 ; i<1024 ; i++) {if (i==u_width-1-y+u_height*x) {return u_mat[i];}};return 0;}
+int mat_(int x, int y, bool r) {return r?mat(y/u_side,x/u_side):mat(x/u_side,y/u_side);}
 int abs(int x) {return x<0?-x:x;}
 bool line_(int x0, int y0, int x1, int y1, bool r) {
 	int dx = x1>x0?1:-1;
@@ -116,8 +124,8 @@ bool line(int x0, int y0, int x1, int y1) {
 	else {return line_(y0,x0,y1,x1,true);}
 }
 void main(void) {
-	int x = int((v_position.x+1.0)*${width2});
-	int y = int((v_position.y+1.0)*${height2});
+	int x = int((v_position.x+1.0)*v_width2);
+	int y = int((v_position.y+1.0)*v_height2);
 	vec4 color = u_color;
 	if (u_tex) {
 		color *= texture2D(u_texture, v_texcoord*u_repeat);
@@ -137,8 +145,8 @@ void main(void) {
 			lx = int(u_lights[i].x);
 			ly = int(u_lights[i].y);
 			power = u_lights[i].z*(1.0+0.2*abs(sin(u_time+float(i))));
-			if (line(x,y,lx,ly)) {
-				d = distance(vec2(x,y), vec2(lx,ly));
+			d = distance(vec2(x,y), vec2(lx,ly));
+			if ((1.1-d/(power*20.0)>d3 || 1.0-d/(power*10.0)>d2) && line(x,y,lx,ly)) {
 				d2 = max(d2, 1.0-d/(power*10.0));
 				d3 = max(d3, 1.1-d/(power*20.0));
 			}
@@ -188,6 +196,11 @@ const locMat = gl.getUniformLocation(shaderProgram, "u_mat");
 const locLights = gl.getUniformLocation(shaderProgram, "u_lights");
 const locNLights = gl.getUniformLocation(shaderProgram, "u_nlights");
 const locGlobalTex = gl.getUniformLocation(shaderProgram, "u_texture");
+const locWidth = gl.getUniformLocation(shaderProgram, "u_width");
+const locHeight = gl.getUniformLocation(shaderProgram, "u_height");
+const locWidth2 = gl.getUniformLocation(shaderProgram, "u_width2");
+const locHeight2 = gl.getUniformLocation(shaderProgram, "u_height2");
+const locSide = gl.getUniformLocation(shaderProgram, "u_side");
 
 /* ======= Associating shaders to buffer objects =======*/
 
@@ -245,7 +258,7 @@ let setTex = function(index) {
 loadTex("wall2.png", "wall");
 loadTex("wall.png", "bg");
 loadTex("img.png", "kirby");
-loadTex("knight.png", "knight");
+loadTex("knightIdle2.png", "knight");
 gl.uniform1i(locGlobalTex, 0);
 
 /*============= Drawing the Quad ================*/
@@ -253,11 +266,23 @@ gl.uniform1i(locGlobalTex, 0);
 // Enable the depth test
 //gl.enable(gl.DEPTH_TEST);
 
-// Set the view port
-gl.viewport(0,0,canvas.width,canvas.height);
-
 let setMap = function() {
-	gl.uniform1iv(locMat,map.map.flat().map(e=>e==1?1:0));
+	width = map.w*side;
+	height = map.h*side;
+	width2 = width/2;
+	height2 = height/2;
+	canvas.width = width;
+	canvas.height = height;
+
+	// Set the view port
+	gl.viewport(0, 0, width, height);
+	
+	gl.uniform1iv(locMat, map.map.flat().map(e=>e==1?1:0));
+	gl.uniform1i(locWidth, map.w);
+	gl.uniform1i(locHeight, map.h);
+	gl.uniform1f(locWidth2, width2);
+	gl.uniform1f(locHeight2, height2);
+	gl.uniform1i(locSide, side);
 }
 
 let clearMap = function(r, g, b) {

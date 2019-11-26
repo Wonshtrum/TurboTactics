@@ -110,10 +110,10 @@ let mouseDown = function(e) {
 		tryMove(nx, ny);
 	}
 	me.paths = [];
-	if (tile[0] === "P") {
-		let player = PLAYERS[tile];
-		console.log(player);
-		let paScale = player.pa;
+	if (typeof(tile) == "string") {
+		let entity = entities[tile];
+		console.log(entity);
+		let paScale = entity.pa;
 		pos = paths(x, y);
 		for (let [i, j, k] of pos) {
 			map.buffer[0].push([i*side, j*side, (i+1)*side, (j+1)*side, 0+1*k/paScale, 0.5+0.0*k/paScale, 0.5+0.5*k/paScale, 0.5, true]);

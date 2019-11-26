@@ -1,30 +1,34 @@
 package Game.Map;
 
 import java.util.ArrayList;
+
+import Game.Game;
 import Game.Entity.Entity;
 import Game.Entity.Mob;
 import Utils.Stats;
 
-public class SortedList {
-	public ArrayList<Entity> sortedEntityOrder;
+public class TurnManager {
+	public ArrayList<Entity> entities;
 	private Entity entityTurn;
+	private Game game;
 	
-	public SortedList(ArrayList<Entity> entityOrder) {
-		this.sortedEntityOrder=entityOrder;
+	public TurnManager(ArrayList<Entity> entityOrder, Game game) {
+		this.entities=entityOrder;
 		this.sort();
-		this.entityTurn=sortedEntityOrder.get(0);
+		this.entityTurn=entities.get(0);
+		this.game = game;
 	}
 	
 	public void sort() {
-		sortedEntityOrder.sort((e1, e2)->e1.getStat(Stats.initiative)-e2.getStat(Stats.initiative));		
+		entities.sort((e1, e2)->e1.getStat(Stats.initiative)-e2.getStat(Stats.initiative));		
 	}
 	
 	public int size() {
-		return this.sortedEntityOrder.size();
+		return this.entities.size();
 	}
 	
 	public void add(Entity entity) {
-		this.sortedEntityOrder.add(entity);
+		this.entities.add(entity);
 		this.sort();
 	}
 	
@@ -32,16 +36,16 @@ public class SortedList {
 		if (this.entityTurn==entity) {
 			next();
 		}
-		this.sortedEntityOrder.remove(entity);
+		this.entities.remove(entity);
 	}
 	
 	public void next() {
-		int index = this.sortedEntityOrder.indexOf(this.entityTurn);
+		int index = this.entities.indexOf(this.entityTurn);
 		this.entityTurn.endTurn();
 		if (index==this.size()-1) {
-			this.entityTurn=this.sortedEntityOrder.get(0);
+			this.entityTurn=this.entities.get(0);
 		} else {
-			this.entityTurn=this.sortedEntityOrder.get(index+1);
+			this.entityTurn=this.entities.get(index+1);
 		}
 		this.entityTurn.beginTurn();
 		if (this.entityTurn instanceof Mob) {
