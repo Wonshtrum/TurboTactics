@@ -37,7 +37,7 @@ public class Game {
 					if (path != null) {
 						int pa = path.size();
 						player.move(gx, gy, pa);
-						this.broadcast("move", "[#"+player+"#,"+pa+","+Tools.pathToString(path)+"]");
+						this.broadcast("move", "[#"+player+"#,"+player.getPa()+","+Tools.pathToString(path)+"]");
 					}
 				}
 				break;

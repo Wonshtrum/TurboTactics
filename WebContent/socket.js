@@ -29,7 +29,7 @@ socket.onmessage = function(event) {
 		let player = entities[id];
 		let [x, y] = path[0];
 		map.map[player.x][player.y] = 0;
-		player.pa -= pa;
+		player.pa = pa;
 		path.push([player.x, player.y]);
 		player.x = x;
 		player.y = y;

@@ -24,7 +24,7 @@ public class Mob extends Entity {
 				path = path.subList(length-this.pa, length);
 			}
 			this.move(path.get(0).x, path.get(0).y, path.size());
-			return new Couple<String, String>("move", "[#"+this+"#,0,"+Tools.pathToString(path)+"]");
+			return new Couple<String, String>("move", "[#"+this+"#,"+this.pamax+","+Tools.pathToString(path)+"]");
 		} else {
 			return new Couple<String, String>("msg", "#Come over here!#");
 		}
