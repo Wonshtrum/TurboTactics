@@ -36,7 +36,7 @@ socket.onmessage = function(event) {
 		animateMultipleSteps(id, [side, side, 1, 0, 0, 1, true, "knight"], path.reverse().map(e => [e[0]*side, e[1]*side]), side/2, [x, y, id]);
 	} else if (data.type === "end") {
 		let player = PLAYERS[data.data];
-		player.pa = player.pamax;
+		player.pa = player.paMax;
 		mouseDown();
 	} else if (data.type === "rm") {
 		let player  = PLAYERS[data.data];

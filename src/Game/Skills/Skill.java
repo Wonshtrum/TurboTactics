@@ -13,9 +13,7 @@ public abstract class Skill {
 	public int manaCost;
 	public boolean affectedByWall;
 	public boolean diagonal;
-	
-	public ArrayList<Effect> effects;
-	
+		
 	public String description;
 	
 	

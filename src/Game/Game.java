@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import Game.Entity.Player;
 import Game.Map.Map;
 import Utils.Couple;
+import Utils.Stats;
 
 public class Game {
 	private HashMap<String, Player> players;
@@ -31,7 +32,7 @@ public class Game {
 				int gx = Integer.parseInt(args[0]);
 				int gy = Integer.parseInt(args[1]);
 				if(map.sortedEntityOrder.isTurn(player)) {
-					ArrayList<Couple<Integer, Integer>> path = this.map.path(player.posX, player.posY, gx, gy, player.getPa());
+					ArrayList<Couple<Integer, Integer>> path = this.map.path(player.posX, player.posY, gx, gy, player.getStat(Stats.pa));
 					if (path != null) {
 						String result = "[";
 						int pa = path.size();
@@ -46,8 +47,19 @@ public class Game {
 					}
 				}	
 				break;
+			case "attack":
+				if (map.sortedEntityOrder.isTurn(player)) {
+					int aimPosX = Integer.parseInt(args[0]);
+					int aimPosY = Integer.parseInt(args[1]);
+					if (!((player.posX == aimPosX) && (player.posY == aimPosY))){
+						if (map.straightLine(player.posX, player.posY, aimPosX, aimPosY, player.getEquipment().Weapon.getRange())) {
+							//player.dealDamage(player.getEquipment().Weapon.getDmgFlat(),(Entity)map.checkTile(aimPosX, aimPosY));
+						}
+					}
+				}
+				break;
 			case "endTurn":
-				if(map.sortedEntityOrder.isTurn(player)) {
+				if (map.sortedEntityOrder.isTurn(player)) {
 					this.broadcast("end", "#"+player+"#");
 					map.sortedEntityOrder.next();
 				}
@@ -92,7 +104,7 @@ public class Game {
 	public void start() {
 		this.map = new Map(8, 8, 0, players.values().stream().collect(Collectors.toList()));
 		for (Player player : players.values()) {
-			player.setPa(player.getPamax());
+			player.setStat(Stats.pa, player.getStat(Stats.paMax));
 			player.setMap(this.map);
 		}
 		this.broadcast("start");

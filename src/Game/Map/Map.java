@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;	
 
 import Game.Entity.Entity;
+import Game.Entity.Goblin;
 import Game.Entity.Mob;
 import Game.Entity.Player;
 import Game.Map.Exit;
@@ -61,7 +62,7 @@ public class Map {
 					break;
 			}
 		}
-		Mob monstreTest = new Mob(this);
+		Mob monstreTest = Goblin.generate(this);
 		place(width-2, height-2, monstreTest);
 		entityOrder.add(monstreTest);
 		place(width-1, height-1, new Exit(0, 0));
@@ -145,6 +146,76 @@ public class Map {
 			parents.addAll(newParents);
 		}
 		return null;
+	}
+	
+	private boolean unfoldPos(int x, int y, int dx, double dy, boolean reverse, boolean flipx, boolean flipy) {
+		int posX = dx;
+		int posY = (int)(Math.floor(dy));
+		if (reverse) {
+			int tmp = posX;
+			posX = posY;
+			posY = tmp;
+		}
+		if (flipx) {
+			posY=-posY;
+		}
+		if (flipy) {
+			posX=-posX;			
+		}
+		return (!(this.checkTile(posX, posY) instanceof Air));
+	}
+	
+	private boolean straightLine(int x, int y, int dx, int dy, boolean reverse, boolean flipX, boolean flipY) {
+		double coef = dy/dx;
+		double posY = 0.5 + 0.5*coef;
+		double totalPosY = posY;
+		for (int posX=1;posX<dx;posX++) {
+			if (unfoldPos(x,y,posX,totalPosY,reverse,flipX,flipY)) {
+				return false;
+			}
+			posY+=coef;
+			totalPosY+=coef;
+			if (posY>=1) {
+				if (posY == 1) {
+					if (unfoldPos(x,y,posX,totalPosY,reverse,flipX,flipY) && (unfoldPos(x,y,posX + 1 ,totalPosY - 1 ,reverse,flipX,flipY) )) {
+						return false;
+					}
+				} else {
+					if (unfoldPos(x,y,posX,totalPosY,reverse,flipX,flipY)) {
+						return false;
+					}
+				}
+				posY--;
+			}
+		}
+		return true;
+	}
+
+	
+	public boolean straightLine(int x, int y, int gx, int gy, int range) {
+		if (Math.abs(gx-x)+Math.abs(gy-y)>range) {
+			boolean flipX = false;
+			boolean flipY = false;
+			boolean reverse = false;
+			int dx = gx - x;
+			int dy = gy - y;
+			if ( dx < 0 ) {
+				flipX = true;
+				dx *=-1;
+			}
+			if (dy < 0) {
+				flipY = true;
+				dy *=-1;
+			}
+			if ( dy > dx ) {
+				reverse = true;
+				int tmp = dx;
+				dx = dy;
+				dy = tmp;
+			}
+			return straightLine(x, y, dx, dy, reverse, flipX, flipY);
+		}
+		return false;
 	}
 	
 	public ArrayList<Couple<Integer, Integer>> path(int x, int y, int gx, int gy, int pamax) {

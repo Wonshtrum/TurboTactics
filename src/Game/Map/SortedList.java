@@ -3,6 +3,7 @@ package Game.Map;
 import java.util.ArrayList;
 import Game.Entity.Entity;
 import Game.Entity.Mob;
+import Utils.Stats;
 
 public class SortedList {
 	public ArrayList<Entity> sortedEntityOrder;
@@ -15,7 +16,7 @@ public class SortedList {
 	}
 	
 	public void sort() {
-		sortedEntityOrder.sort((e1, e2)->e1.initiative-e2.initiative);		
+		sortedEntityOrder.sort((e1, e2)->e1.getStat(Stats.initiative)-e2.getStat(Stats.initiative));		
 	}
 	
 	public int size() {

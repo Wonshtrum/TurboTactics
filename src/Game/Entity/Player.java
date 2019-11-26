@@ -11,7 +11,8 @@ public class Player extends Entity {
 	private String name;
 
 	public Player (String name, Session session) {
-		super(null);
+		//String id, int hpMax, int mpMax, int paMax, int armor, int initiative, int level, int xp, int intel, int str, int dext, int gold, Map map
+		super(session.getId(), 20, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0,null);
 		this.session=session;
 		this.setId(session.getId());
 		this.name=name;
@@ -23,10 +24,6 @@ public class Player extends Entity {
 	
 	public String getName() {
 		return name;
-	}
-	
-	public void setPa(int pa) {
-		this.pa = pa;
 	}
 
 	public void setMap(Map map) {

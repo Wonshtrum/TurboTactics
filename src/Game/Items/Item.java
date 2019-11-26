@@ -1,5 +1,8 @@
 package Game.Items;
 
-public class Item {
-
+public abstract class Item {
+	
+	private String name;
+	private int rarity;
+	private int price;
 }
