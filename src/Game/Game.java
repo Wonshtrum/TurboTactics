@@ -131,6 +131,10 @@ public class Game {
 	public void broadcast(String data) {
 		this.broadcast("msg", "#"+data+"#");
 	}
+
+	public void broadcast(Couple<String, String> data) {
+		this.broadcast(data.x, data.y);
+	}
 	
 	public void broadcast(String type, String data) {
 		List<Player> playersList = this.players.values().stream().collect(Collectors.toList());

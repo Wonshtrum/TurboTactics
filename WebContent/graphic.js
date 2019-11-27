@@ -102,7 +102,14 @@ uniform int u_nlights;
 uniform sampler2D u_texture;
 uniform float u_repeat;
 uniform int u_mat[1024];
-int mat(int x, int y) {for (int i=0 ; i<1024 ; i++) {if (i==u_width-1-y+u_height*x) {return u_mat[i];}};return 0;}
+int mat(int x, int y) {
+	for (int i=0 ; i<1024 ; i++) {
+		if (i==u_width-1-y+u_height*x) {
+			return u_mat[i];
+		}
+	}
+	return 0;
+}
 int mat_(int x, int y, bool r) {return r?mat(y/u_side,x/u_side):mat(x/u_side,y/u_side);}
 int abs(int x) {return x<0?-x:x;}
 bool line_(int x0, int y0, int x1, int y1, bool r) {
@@ -144,6 +151,148 @@ void main(void) {
 			}
 			lx = int(u_lights[i].x);
 			ly = int(u_lights[i].y);
+			power = u_lights[i].z*(1.0+0.2*abs(sin(u_time+float(i))));
+			d = distance(vec2(x,y), vec2(lx,ly));
+			if ((1.1-d/(power*20.0)>d3 || 1.0-d/(power*10.0)>d2) && line(x,y,lx,ly)) {
+				d2 = max(d2, 1.0-d/(power*10.0));
+				d3 = max(d3, 1.1-d/(power*20.0));
+			}
+		}
+		if (d3 != 0.0) {
+			gl_FragColor = vec4(vec3(1,0.7,0.5)*(vec3(color)+d2*d2*d2)*d3+minL*vec3(color), color[3]);
+		} else {
+			gl_FragColor = vec4(vec3(color)*minL, color[3]);
+		}
+	} else {
+		gl_FragColor = color;
+	}
+}`;
+
+let fragCode2 =
+`precision mediump float;
+varying vec3 v_position;
+varying vec2 v_texcoord;
+varying float v_width2;
+varying float v_height2;
+uniform int u_width;
+uniform int u_height;
+uniform int u_side;
+uniform float u_time;
+uniform vec4 u_color;
+uniform bool u_lit;
+uniform bool u_tex;
+uniform vec3 u_lights[100];
+uniform int u_nlights;
+uniform sampler2D u_texture;
+uniform float u_repeat;
+uniform int u_mat[1024];
+int mat(int x, int y) {
+	for (int i=0 ; i<1024 ; i++) {
+		if (i==u_width-1-y+u_height*x) {
+			return u_mat[i];
+		}
+	}
+	return 0;
+}
+int abs(int x) {return x<0?-x:x;}
+bool inbound(int x, int y) {return x>=0 && y>=0 && x<u_width && y<u_height;}
+bool unfoldPos(float x, float y, int dx, float dyf, bool reverse, bool flipX, bool flipY) {
+	int dy = int(dyf);
+	if (reverse) {
+		int tmp = dx;
+		dx = dy;
+		dy = tmp;
+	}
+	if (flipX)
+		dx *= -1;
+	if (flipY)
+		dy *= -1;
+	int ix = int(x+float(dx));
+	int iy = int(y+float(dy));
+	return inbound(ix, iy)?(mat(ix, iy)!=0):true;
+}
+bool line_(float x, float y, int dx, float coef, bool reverse, bool flipX, bool flipY) {
+	int posX = 0;
+	float posY, totPosY;
+	posY = totPosY = 0.5+0.5*coef;
+	if (posY == 1.0) {
+		if (unfoldPos(x, y, posX+1, totPosY-1.0, reverse, flipX, flipY) && unfoldPos(x, y, posX, totPosY, reverse, flipX, flipY))
+			return false;
+		posY--;
+	}
+	for (int posX=1 ; posX<1024 ; posX++) {
+		if (posX >= dx) {break;}
+		if (unfoldPos(x, y, posX, totPosY, reverse, flipX, flipY))
+			return false;
+		posY += coef;
+		totPosY += coef;
+		if (posY >= 1.0) {
+			if (posY == 1.0) {
+				if (unfoldPos(x, y, posX+1, totPosY-1.0, reverse, flipX, flipY) && unfoldPos(x, y, posX, totPosY, reverse, flipX, flipY))
+					return false;
+			} else {
+				if (unfoldPos(x, y, posX, totPosY, reverse, flipX, flipY))
+					return false;
+			}
+			posY --;
+		}
+	}
+	return !unfoldPos(x, y, dx, totPosY, reverse, flipX, flipY);
+}
+bool line(float xf, float yf, float gxf, float gyf) {
+	int x = int(xf);
+	int y = int(yf);
+	int gx = int(gxf);
+	int gy = int(gyf);
+	bool flipX, flipY, reverse;
+	flipX = flipY = reverse = false;
+	int dx = gx - x;
+	int dy = gy - y;
+	float dxf = gxf - xf;
+	float dyf = gyf - yf;
+	if (dx < 0) {
+		dxf *= -1.0;
+		dx *= -1;
+		flipX = true;
+	}
+	if (dy < 0) {
+		dyf *= -1.0;
+		dy *= -1;
+		flipY = true;
+	}
+	if (dy > dx) {
+		float tmpf = dyf;
+		dyf = dxf;
+		dxf = tmpf;
+		int tmp = dy;
+		dy = dx;
+		dx = tmp;
+		reverse = true;
+	}
+	float coef = dyf/dxf;
+	return line_(float(x)-0.5, float(y)-0.5, dx, coef, reverse, flipX, flipY);
+}
+void main(void) {
+	float x = (v_position.x+1.0)*float(u_width)/2.0;
+	float y = (v_position.y+1.0)*float(u_height)/2.0;
+	vec4 color = u_color;
+	if (u_tex) {
+		color *= texture2D(u_texture, v_texcoord*u_repeat);
+	}
+	if (u_lit) {
+		float power;
+		float lx;
+		float ly;
+		float d;
+		float minL = 0.6;
+		float d2 = 0.0;
+		float d3 = 0.0;
+		for (int i=0 ; i<100 ; i++) {
+			if (i >= u_nlights) {
+				break;
+			}
+			lx = u_lights[i].x/float(u_side);
+			ly = u_lights[i].y/float(u_side);
 			power = u_lights[i].z*(1.0+0.2*abs(sin(u_time+float(i))));
 			d = distance(vec2(x,y), vec2(lx,ly));
 			if ((1.1-d/(power*20.0)>d3 || 1.0-d/(power*10.0)>d2) && line(x,y,lx,ly)) {
@@ -283,6 +432,8 @@ let setMap = function() {
 	gl.uniform1f(locWidth2, width2);
 	gl.uniform1f(locHeight2, height2);
 	gl.uniform1i(locSide, side);
+
+	wallMapping();
 }
 
 let clearMap = function(r, g, b) {

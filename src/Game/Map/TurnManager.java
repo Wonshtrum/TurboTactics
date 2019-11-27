@@ -48,8 +48,9 @@ public class TurnManager {
 			this.entityTurn=this.entities.get(index+1);
 		}
 		this.entityTurn.beginTurn();
+		this.game.broadcast("Turn of "+this.entityTurn);
 		if (this.entityTurn instanceof Mob) {
-			((Mob)this.entityTurn).play();
+			this.game.broadcast(((Mob)this.entityTurn).play());
 			this.next();
 		}
 	}

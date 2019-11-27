@@ -5,13 +5,28 @@ let random = function(s) {
     return x - Math.floor(x);
 }
 
+let wallMapping = function() {
+	map.buffer[1] = [];
+	for (let x=0 ; x<map.w ; x++) {
+		for (let y=0 ; y<map.h ; y++) {
+			if (map.map[x][y] == 1) {
+				map.buffer[1].push([x*side, (y-0.5)*side, (x+1)*side, (y+0.5)*side, 1, 0.8, 0.8, 1, false, "wall", 1]);
+				map.buffer[1].push([x*side, y*side, (x+1)*side, (y+1)*side, 1, 0.8, 0.8, 1, false, "wall", 1]);
+			}
+		}
+	}
+}
+
 let drawMap = function() {
 	for (let x=0 ; x<map.w ; x++) {
 		for (let y=0 ; y<map.h ; y++) {
 			let tile = map.map[x][y];
 			if (tile == 0) {
 			} else if (tile == 1) {
-				drawQuad(x*side, y*side, (x+1)*side, (y+1)*side, 1, 0.8, 0.8, 1, false, "wall", 1);
+				//drawQuad(x*side, (y-0.5)*side, (x+1)*side, (y+0.5)*side, 1, 0.8, 0.8, 1, false, "wall", 1);
+				//drawQuad(x*side, y*side, (x+1)*side, (y+1)*side, 1, 0.8, 0.8, 1, false, "wall", 1);
+				//drawQuad(x*side, (y+0.5)*side, (x+1)*side, (y+1.5)*side, 1, 0.8, 0.8, 1, false, "wall", 1);
+				//drawQuad(x*side, y*side, (x+1)*side, (y+1)*side, 0.5, 0.4, 0.4, 1, false, "bg", 2);
 			} else if (tile == -1) {
 				drawQuad(x*side, y*side, (x+1)*side, (y+1)*side, 0, 0.5, 0.4, 1, true);
 			} else if (typeof(tile) == "string") {
@@ -83,7 +98,7 @@ let xyOnMapPixel = function(e) {
 }
 
 let drawCursor = function(x, y, r, g, b) {
-	map.buffer[1] = [[x*side, y*side, (x+1)*side, y*side+1, r, g, b, 1, false],
+	map.buffer[2] = [[x*side, y*side, (x+1)*side, y*side+1, r, g, b, 1, false],
 	[(x+1)*side, y*side, (x+1)*side-1, (y+1)*side, r, g, b, 1, false],
 	[x*side, (y+1)*side, x*side+1, y*side, r, g, b, 1, false],
 	[(x+1)*side, (y+1)*side, x*side, (y+1)*side-1, r, g, b, 1, false]];
@@ -91,7 +106,7 @@ let drawCursor = function(x, y, r, g, b) {
 
 let mouseMove = function(e) {
 	let [x, y] = xyOnMapPixel(e);
-	let lights = [x, map.h*side-y, 2, 50, 50, 5];
+	let lights = [x, map.h*side-y, 2, 50, 50, 0];
 	gl.uniform1i(locNLights, lights.length/3);
 	gl.uniform3fv(locLights, lights);
 	[x ,y] = xyOnMap(e);
