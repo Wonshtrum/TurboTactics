@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8">
+    <title>LeaderBoard</title>
+</head>
+
+<link rel="stylesheet" type="text/css" href="/css/style.css">
+<link rel="stylesheet" type="text/css" href="/dist/rpgui.min.css">
+<script src="/dist/rpgui.min.js"></script>
+
+<style>
+    body{
+    background: #aaf;
+    background-image: url("/img/slab0.png");
+    background-repeat: repeat;
+    background-size: 10%;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-crisp-edges;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    }
+</style>
+
+<body>
+<div class="rpgui-content">
+    <div class="rpgui-container framed-golden-2" style="width: 225px;height: 350px; left:43%;top: 30%;">
+    <table>
+        <thead>
+            <tr>
+                <th colspan="3" style="position: center">LEADERBOARD!</th>
+            </tr>
+        </thead>
+        <tbody>
+            <th:block th:each="user: ${users}">
+                <tr>
+                    <!--<td>
+                        <th:block th:each="ach: ${user.achievements}">
+                            <img th:text="${ach.ref}"/>
+                        </th:block>
+                    </td>-->
+                    <td><p th:text="${user.login}"/></td>
+                    <td><p th:text="${user.score}"/></td>
+                </tr>
+            </th:block>
+        </tbody>
+    </table>
+        <button type="button" class="rpgui-button" onclick="location.href='/home'">Menu</button>
+    </div>
+</div>
+</body>
+
+</html>

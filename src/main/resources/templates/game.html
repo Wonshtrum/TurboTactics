@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>TurboTactics</title>
+</head>
+
+<link rel="stylesheet" type="text/css" href="/css/style.css">
+<link rel="stylesheet" type="text/css" href="/dist/rpgui.min.css">
+<script src="/dist/rpgui.min.js"></script>
+
+
+
+<style>
+    body{
+        background-image: url("/img/slab0.png");
+        background-repeat: repeat;
+        background-size: 10%;
+        image-rendering: -moz-crisp-edges;
+        image-rendering: -webkit-crisp-edges;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+    }
+</style>
+
+
+<body>
+<div class="rpgui-content">
+    <div id="contCan" class="rpgui-container framed-golden-2" style=" left:34%;top: 20%;">
+    <canvas id="myCan" width=50 height=50></canvas>
+    <div id="chat"></div>
+    <button class="rpgui-button golden" type="button" style="width:30%; margin-right: 20px;" onclick="endTurn()"><p>Fin</p></button>
+    <button class="rpgui-button golden" type="button" style="width:30%; margin-left: auto;" onclick="location.href='/home'"><p>Menu</p></button>
+    </div>
+</div>
+</body>
+
+
+
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const idGame = /*[[${idGame}]]*/ "tmp";
+    /*]]>*/
+</script>
+<script src="/js/socket.js" type="text/javascript"></script>
+<script src="/js/graphic.js" type="text/javascript"></script>
+<script src="/js/game.js" type="text/javascript"></script>
+<script src="/js/logic.js" type="text/javascript"></script>
+
+</html>

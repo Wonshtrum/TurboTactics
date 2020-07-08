@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Signin</title>
+</head>
+
+<link rel="stylesheet" type="text/css" href="/css/style.css">
+<link rel="stylesheet" type="text/css" href="/dist/rpgui.min.css">
+<script src="/dist/rpgui.min.js"></script>
+
+
+<style>
+    body{
+        background: #aaf;
+        background-image: url("/img/slab0.png");
+        background-repeat: repeat;
+        background-size: 10%;
+        image-rendering: -moz-crisp-edges;
+        image-rendering: -webkit-crisp-edges;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+    }
+</style>
+
+<body>
+
+    <div class="rpgui-content">
+        <div class="rpgui-container framed-golden" style="width: 500px;height: 350px; left:35%;top: 25%;">
+            <h1>Sign In</h1>
+            <hr />
+            <form action="#" th:action="@{/signin}" th:object="${signinForm}" method="post">
+                <label>Login:</label>
+                <input type="text" placeholder="Login..." th:field="*{login}">
+                <br/><br/>
+
+                <label>Password:</label>
+                <input type="password" placeholder="Password..." th:field="*{password}">
+                <br /><br />
+
+                <button class="rpgui-button" action="submit">Confirmer</button>
+                <button type="button" class="rpgui-button" onclick="location.href='/home'">Menu</button>
+                <br/><br/>
+                <div th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;font-style:italic;"></div>
+
+            </form>
+        </div>
+    </div>
+
+</body>
+
+</html>

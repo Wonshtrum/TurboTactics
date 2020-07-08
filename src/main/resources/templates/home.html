@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+
+<link rel="stylesheet" type="text/css" href="/css/style.css">
+<link rel="stylesheet" type="text/css" href="/dist/rpgui.min.css">
+<script src="/dist/rpgui.min.js"></script>
+
+<style>
+    body{
+        background-image: url("/img/slab0.png");
+        background-repeat: repeat;
+        background-size: 10%;
+        image-rendering: -moz-crisp-edges;
+        image-rendering: -webkit-crisp-edges;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+    }
+    button{
+        margin: 0 auto;
+    }
+    div{
+        text-align:center;
+    }
+    img{
+        margin-top: 5%;
+        left: 35%;
+        width: 800px;
+        height: auto;
+    }
+</style>
+
+<body>
+
+
+<div class="rpgui-content">
+    <img src="/img/maintitle.png">
+    <div class="rpgui-container framed-golden" style="width: 500px;height: 350px; left:35%;top: 35%;">
+
+    <button class="rpgui-button" onclick="location.href='/newgame'" style="margin-right: auto">New Game</button>
+        <br>
+    <button class="rpgui-button" onclick="location.href='/board'">LeaderBoard</button>
+        <br>
+    <button class="rpgui-button" onclick="location.href='/login'">Log In</button>
+        <br>
+    <button class="rpgui-button" onclick="location.href='/signin'">Sign In</button>
+        <br>
+    <button class="rpgui-button" onclick="location.href='/disconnection'">Disconnect</button>
+        <br>
+    </div>
+</div>
+</body>
+
+</html>
